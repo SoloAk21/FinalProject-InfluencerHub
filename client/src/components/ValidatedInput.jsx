@@ -20,7 +20,7 @@ const ValidatedInput = ({
         onChange={onChange}
         required={required}
         type={type}
-        className="placeholder:text-xs"
+        className="placeholder:text-xs text-xs"
       />
       {error && (
         <Typography className=" text-[10px] ml-4 mt-1" color="red">

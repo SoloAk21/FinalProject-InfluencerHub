@@ -11,3 +11,5 @@ export const INDUSTRY = [
   "Media",
   "Other",
 ];
+
+export const CONTENT = INDUSTRY;

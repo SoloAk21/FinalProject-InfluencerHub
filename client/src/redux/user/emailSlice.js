@@ -15,8 +15,12 @@ const emailSlice = createSlice({
       state.email = action.payload; // Update email state
       state.error = null;
     },
+    emailAuthReset: (state) => {
+      state.email = null;
+      state.error = null;
+    },
   },
 });
 
-export const { emailAuthSuccess } = emailSlice.actions;
+export const { emailAuthSuccess, emailAuthReset } = emailSlice.actions;
 export default emailSlice.reducer;

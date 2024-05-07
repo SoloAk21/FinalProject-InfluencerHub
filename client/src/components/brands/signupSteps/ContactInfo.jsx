@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Card, Button, Typography } from "@material-tailwind/react";
+import { Card, Button, Typography, IconButton } from "@material-tailwind/react";
 import { PhoneNumberInput } from "../../PhoneNumberInput";
 import validator from "validator";
 import ValidatedInput from "../../ValidatedInput"; // Import the ValidatedInput component
 import { useSelector } from "react-redux";
+import { FaArrowRight } from "react-icons/fa";
 
 export default function ContactInfo({ onNext }) {
   const email = useSelector((state) => state.email.email);
@@ -70,7 +71,30 @@ export default function ContactInfo({ onNext }) {
       return;
     }
 
-    // If all inputs are valid
+    try {
+      const response = await fetch("/api/company-auth/check-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (data.success === false) {
+        newErrors.email = data.message;
+        setErrors(newErrors);
+        setIsLoading(false);
+        return;
+      }
+    } catch (error) {
+      console.error("Error checking company name:", error);
+      setErrors({
+        email: "Error checking company name. Please try again.",
+      });
+      setIsLoading(false);
+      return;
+    }
+    setErrors({});
     setIsLoading(false);
     onNext(contactInfo);
   };
@@ -134,9 +158,9 @@ export default function ContactInfo({ onNext }) {
         />
 
         <div className="flex justify-end mt-8">
-          <Button type="submit" loading={isLoading}>
-            Next
-          </Button>
+          <IconButton type="submit" loading={isLoading}>
+            <FaArrowRight />
+          </IconButton>
         </div>
       </form>
     </Card>

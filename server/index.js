@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
 import companyAuthRouter from "./routes/company/companyAuth.route.js";
+import influencerAuthRouter from "./routes/influencer/influencerAuth.route.js";
 const app = express();
 app.use(cookieParser());
 const PORT = 3000;
@@ -19,6 +20,7 @@ app.listen(PORT, () => {
 });
 
 app.use("/api/company-auth", companyAuthRouter);
+app.use("/api/influencer-auth", influencerAuthRouter);
 
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;

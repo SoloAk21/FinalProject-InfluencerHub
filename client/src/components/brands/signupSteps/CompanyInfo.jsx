@@ -1,8 +1,14 @@
 import React, { useState } from "react";
-import { Card, Button, Typography, Textarea } from "@material-tailwind/react";
+import {
+  Card,
+  Button,
+  Typography,
+  Textarea,
+  IconButton,
+} from "@material-tailwind/react";
 import { INDUSTRY } from "../../../constants";
 import MultiSelect from "../../MultiSelect";
-import { FaExclamation } from "react-icons/fa";
+import { FaArrowRight, FaExclamation } from "react-icons/fa";
 import ValidatedInput from "../../ValidatedInput";
 import validator from "validator";
 
@@ -117,13 +123,13 @@ export default function CompanyInfo({ onNext }) {
           />
         </div>
         <div className="flex justify-end">
-          <Button
+          <IconButton
             type="submit"
             loading={isLoading}
             className="p-2 capitalize mt-4 w-16"
           >
-            Next
-          </Button>
+            <FaArrowRight />
+          </IconButton>
         </div>
       </form>
     </Card>

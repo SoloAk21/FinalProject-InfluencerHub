@@ -24,6 +24,26 @@ export const checkCompanyName = async (req, res, next) => {
     next(error);
   }
 };
+export const checkCompanyEmail = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const emailExists = await Company.findOne({ email });
+
+    if (emailExists) {
+      return res.status(200).json({
+        success: false,
+        message: "Email already exists.",
+      });
+    } else {
+      return res.status(200).json({
+        success: true,
+        message: "Email is available.",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const companySignUp = async (req, res, next) => {
   try {

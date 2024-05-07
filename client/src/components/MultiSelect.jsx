@@ -64,23 +64,23 @@ export default function MultiSelect({
   };
 
   return (
-    <div className=" text-xs ">
+    <div>
       <label className="relative">
-        <input type="checkbox" className="hidden peer" />
-        <div className=" text-sm  text-blue-gray-500 mt-2 cursor-pointer  after:content-['▼'] after:text-xs after:ml-1 after:inline-flex after:items-center  min-w-full peer-checked:after:-rotate-180 after:transition-transform inline-flex border border-blue-gray-200 rounded px-5 py-2">
+        <input type="checkbox" className="hidden peer " />
+        <div className=" text-xs  text-blue-gray-500  cursor-pointer  after:content-['▼'] after:text-xs after:ml-1 after:inline-flex after:items-center  min-w-full peer-checked:after:-rotate-180 after:transition-transform inline-flex border border-blue-gray-200 rounded px-5 py-3 ">
           {label}
           {isJsEnabled && selectedOptions.length > 0 && (
             <span className="ml-1 text-green-500">{`(${selectedOptions.length} selected)`}</span>
           )}
         </div>
-        <div className="absolute z-10 bg-white border transition-opacity opacity-0 pointer-events-none peer-checked:opacity-100 peer-checked:pointer-events-auto w-full max-h-60 overflow-y-scroll">
+        <div className="text-xs absolute z-10 bg-white border transition-opacity opacity-0 pointer-events-none peer-checked:opacity-100 peer-checked:pointer-events-auto w-full max-h-60 overflow-y-scroll">
           {isJsEnabled && (
             <ul>
               <li>
                 <button
                   onClick={handleSelectAllClick}
                   disabled={!isSelectAllEnabled}
-                  className="w-full text-left px-2 py-1 text-blue-gray-900 disabled:opacity-50"
+                  className=" w-full text-left px-2 py-1 text-blue-gray-900 disabled:opacity-50"
                 >
                   {"Select All"}
                 </button>

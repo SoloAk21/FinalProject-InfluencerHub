@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Card, Button, Typography } from "@material-tailwind/react";
-import { FaFilePdf, FaUpload } from "react-icons/fa";
+import { Card, Button, Typography, IconButton } from "@material-tailwind/react";
+import { FaArrowRight, FaFilePdf, FaUpload } from "react-icons/fa";
 
 export default function LicenceVerification({ onNext, formData }) {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -17,7 +17,7 @@ export default function LicenceVerification({ onNext, formData }) {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleNext = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -34,7 +34,7 @@ export default function LicenceVerification({ onNext, formData }) {
   return (
     <Card className="mx-auto max-w-xl" color="transparent" shadow={false}>
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleNext}
         className="flex flex-col  gap-2 md:gap-4 mt-8 mb-2 w-72 max-w-screen-lg sm:w-96"
       >
         <Typography variant="h6" color="blue-gray" className="text-center mb-4">
@@ -80,9 +80,9 @@ export default function LicenceVerification({ onNext, formData }) {
           </div>
         )}
         <div className="flex justify-end mt-4">
-          <Button type="submit" loading={isLoading} className="capitalize ">
-            Next
-          </Button>
+          <IconButton type="submit" loading={isLoading} className="capitalize ">
+            <FaArrowRight />
+          </IconButton>
         </div>
       </form>
     </Card>
