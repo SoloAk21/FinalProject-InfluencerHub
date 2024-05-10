@@ -5,6 +5,7 @@ import validator from "validator";
 import ValidatedInput from "../../ValidatedInput"; // Import the ValidatedInput component
 import { useSelector } from "react-redux";
 import { FaArrowRight } from "react-icons/fa";
+import { postToAuthAPI } from "../../../helper/postToAuthAPI";
 
 export default function ContactInfo({ onNext }) {
   const email = useSelector((state) => state.email.email);
@@ -70,13 +71,10 @@ export default function ContactInfo({ onNext }) {
       setIsLoading(false);
       return;
     }
+    const apiPath = "/api/auth/companies/check";
 
     try {
-      const response = await fetch("/api/company-auth/check-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      const response = await postToAuthAPI(apiPath, { email });
 
       const data = await response.json();
 

@@ -9,6 +9,7 @@ import { storage } from "../../../firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { emailAuthReset } from "../../../redux/user/emailSlice";
 import { useDispatch } from "react-redux";
+import { postToAuthAPI } from "../../../helper/postToAuthAPI";
 
 export default function CompanyRegReport({ formData }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,14 +35,11 @@ export default function CompanyRegReport({ formData }) {
 
   const handleNext = async (e) => {
     setIsLoading(true);
+    const apiPath = "/api/auth/companies/signup";
 
     try {
       await handleLicenceDocument();
-      const response = await fetch("/api/company-auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await postToAuthAPI(apiPath, formData);
 
       const data = await response.json();
 

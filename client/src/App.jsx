@@ -6,6 +6,8 @@ import SignUpCompany from "./pages/brand/SignUpCompany";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
 import SignUpInfluencer from "./pages/influencer/SignUpInfluencer";
 import OAuth from "./components/AOuth";
+import SignIn from "./pages/SignIn";
+import PrivateRoute from "./components/PrivateRoute";
 
 export default function App() {
   return (
@@ -26,6 +28,9 @@ export default function App() {
             path="/registration-success"
             element={<RegistrationSuccess />}
           />
+          <Route path="/signin" element={<SignIn />} />
+
+          <Route element={<PrivateRoute />}></Route>
         </Routes>
       </BrowserRouter>
     </div>

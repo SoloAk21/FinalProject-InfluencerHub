@@ -55,14 +55,9 @@ export default function CompanyInfo({ onNext }) {
       setIsLoading(false);
       return;
     }
+    const apiPath = "/api/auth/companies/check";
 
     try {
-      const response = await fetch("/api/company-auth/check-company", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ companyName }),
-      });
-
       const data = await response.json();
 
       if (data.success === false) {

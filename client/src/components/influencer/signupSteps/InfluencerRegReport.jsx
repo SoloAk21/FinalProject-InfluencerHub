@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { emailAuthReset } from "../../../redux/user/emailSlice";
 import { useDispatch } from "react-redux";
 import DynamicTable from "../../DynamicTable";
+import { postToAuthAPI } from "../../../helper/postToAuthAPI";
 
 export default function InfluencerRegReport({ formData }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,12 +17,12 @@ export default function InfluencerRegReport({ formData }) {
 
   const handleNext = async () => {
     setIsLoading(true);
+
+    const apiPath = "/api/auth/influencers/signup";
+
     try {
-      const response = await fetch("/api/influencer-auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await postToAuthAPI(apiPath, formData);
+      console.log(formData);
       const data = await response.json();
       console.log(data);
       if (data.success === false) {

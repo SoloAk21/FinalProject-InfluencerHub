@@ -1,13 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Button, Typography, IconButton } from "@material-tailwind/react";
 import { PhoneNumberInput } from "../../PhoneNumberInput";
 import validator from "validator";
 import ValidatedInput from "../../ValidatedInput"; // Ensure you have a ValidatedInput component that can handle validation feedback
 import { useSelector } from "react-redux";
 import { FaArrowRight } from "react-icons/fa";
+import { postToAuthAPI } from "../../../helper/postToAuthAPI";
+import { useNavigate } from "react-router-dom";
 
 export default function ContactInfo({ onNext }) {
   const email = useSelector((state) => state.email.email);
+  const navigate = useNavigate();
+  console.log(email);
+  useEffect(() => {
+    if (!email) {
+      // Redirect to Google Auth path if email is empty
+      navigate("/influencer/google");
+    }
+  }, [email, navigate]);
   const [userInfo, setUserInfo] = useState({
     username: "",
     email: email,
@@ -51,15 +61,11 @@ export default function ContactInfo({ onNext }) {
     }
 
     const checkData = { email: userInfo.email, username: userInfo.username };
+
+    const apiPath = "/api/auth/influencers/check";
+
     try {
-      const response = await fetch(
-        "/api/influencer-auth/check-username-email",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(checkData),
-        }
-      );
+      const response = await postToAuthAPI(apiPath, { checkData });
 
       if (!response.ok) {
         throw new Error(
