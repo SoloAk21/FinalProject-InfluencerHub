@@ -137,7 +137,7 @@ export default function SignIn() {
             </div>
             <div className="mt-3 w-full">
               <OAuth
-                userType={formData.userType}
+                userType={formData.userType.toLowerCase()}
                 className="flex justify-center items-center p-3 w-full lowercase font-thin"
               />
             </div>

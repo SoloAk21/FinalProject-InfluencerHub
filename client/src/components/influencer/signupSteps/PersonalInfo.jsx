@@ -33,8 +33,8 @@ export default function PersonalInfo({ onNext }) {
     e.preventDefault();
     const newErrors = {};
     const { firstName, lastName, dateOfBirth, contents, city, gender } =
-      personalInfo;
-    // Validating required fields
+      personalInfo; 
+    // Validating required fields 
     if (!firstName) newErrors.firstName = "First name is required";
     if (!lastName) newErrors.lastName = "Last name is required";
     if (!dateOfBirth) newErrors.dateOfBirth = "Date of birth is required";
@@ -152,11 +152,11 @@ export default function PersonalInfo({ onNext }) {
           className="text-xs placeholder:text-xs py-2 "
           label="Biography (optional)"
           value={personalInfo.biography}
-          onChange={(e) => handleChange("biography", e.target.value)}
+          onChange={(e) => handleChange("biography", e.target.value)}   
         />
 
-        <div className="flex justify-end">
-          <IconButton type="submit" className="capitalize " size="sm">
+        <div className="flex justify-end"> 
+          <IconButton type="submit" className="capitalize" size="sm">
             <FaArrowRight />
           </IconButton>
         </div>

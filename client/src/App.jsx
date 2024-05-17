@@ -8,6 +8,7 @@ import SignUpInfluencer from "./pages/influencer/SignUpInfluencer";
 import OAuth from "./components/AOuth";
 import SignIn from "./pages/SignIn";
 import PrivateRoute from "./components/PrivateRoute";
+import UserProfile from "./components/UserProfile";
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
             element={<RegistrationSuccess />}
           />
           <Route path="/signin" element={<SignIn />} />
+          <Route path="/userprofile" element={<UserProfile />} />
 
           <Route element={<PrivateRoute />}></Route>
         </Routes>
