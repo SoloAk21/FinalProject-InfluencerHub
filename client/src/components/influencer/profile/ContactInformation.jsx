@@ -6,11 +6,9 @@ import {
   IconButton,
   Textarea,
 } from "@material-tailwind/react";
-
 import validator from "validator";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-
+import { useDispatch, useSelector } from "react-redux";
 import { FaArrowRight } from "react-icons/fa";
 import ValidatedInput from "../../ValidatedInput";
 import MultiSelect from "../../MultiSelect";
@@ -18,20 +16,20 @@ import { CITIES, CONTENTS, GENDER } from "../../../constants";
 import { PhoneNumberInput } from "../../PhoneNumberInput";
 import { postToAuthAPI } from "../../../helper/postToAuthAPI";
 import { formatDate } from "../../../helper/formatDate";
+import { updateUserProfile } from "../../../redux/user/userSlice";
 
 export default function ContactInformation() {
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const selectedPlatforms = currentUser.platforms.map(
     (platform) => platform.name
   );
   const selectedContents = currentUser.contents;
 
-  const [userInfo, setUserInfo] = useState({
+  const initialUserInfo = {
     username: currentUser.username,
     email: currentUser.email,
-    phoneNumber: currentUser.phoneNumber || "",
     firstName: currentUser.firstName || "",
     lastName: currentUser.lastName || "",
     dateOfBirth: formatDate(currentUser.dateOfBirth) || "",
@@ -39,9 +37,9 @@ export default function ContactInformation() {
     city: currentUser.city || "",
     biography: currentUser.biography || "",
     gender: currentUser.gender || "",
-    platforms: selectedPlatforms || [],
-  });
+  };
 
+  const [userInfo, setUserInfo] = useState(initialUserInfo);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -50,10 +48,30 @@ export default function ContactInformation() {
     setUserInfo((prev) => ({ ...prev, [field]: value }));
     setIsEditing(true);
   };
-  const handleDateChange = (date) => {
-    const formattedDate = date.toISOString().slice(0, 10);
-    setUserInfo((prev) => ({ ...prev, dateOfBirth: formattedDate }));
+
+  const handleDateChange = (event) => {
+    const { value } = event.target;
+    const date = new Date(value);
+
+    // Check if the date is valid before attempting to format it
+    if (!isNaN(date.getTime())) {
+      const formattedDate = date.toISOString().slice(0, 10);
+      setUserInfo((prev) => ({ ...prev, dateOfBirth: formattedDate }));
+      setIsEditing(true);
+    } else {
+      // Handle invalid date input, such as clearing the error or providing feedback
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        dateOfBirth: "Invalid date",
+      }));
+    }
   };
+
+  const handleCancel = () => {
+    setUserInfo(initialUserInfo);
+    setIsEditing(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -66,9 +84,9 @@ export default function ContactInformation() {
       newErrors.username = "Username must be at least 4 characters long";
     }
 
-    if (!validator.isMobilePhone(userInfo.phoneNumber)) {
-      newErrors.phoneNumber = "Valid phone number is required";
-    }
+    // if (!validator.isMobilePhone(userInfo.phoneNumber)) {
+    //   newErrors.phoneNumber = "Valid phone number is required";
+    // }
 
     if (userInfo.firstName.trim().length < 3)
       newErrors.firstName = "First name must be at least 3 characters long";
@@ -91,17 +109,23 @@ export default function ContactInformation() {
       setIsLoading(false);
       return;
     }
-    const checkData = { username: userInfo.username };
 
-    const apiPath = "/api/auth/influencers/check";
+    const updatedData = {};
+    Object.keys(userInfo).forEach((key) => {
+      if (userInfo[key] !== initialUserInfo[key]) {
+        updatedData[key] = userInfo[key];
+      }
+    });
+
+    const apiPath = `/api/user/update/${currentUser._id}`;
 
     try {
-      const response = await postToAuthAPI(apiPath, { checkData });
+      const response = await postToAuthAPI(apiPath, updatedData);
 
       if (!response.ok) {
         throw new Error(
-          `Error checking username and email: ${response.statusText}`
-        ); // More informative error message
+          `Error updating user information: ${response.statusText}`
+        );
       }
 
       const data = await response.json();
@@ -115,12 +139,13 @@ export default function ContactInformation() {
         return;
       }
 
-      console.log(currentUser);
+      dispatch(updateUserProfile(updatedData));
+
       setIsEditing(false);
     } catch (error) {
-      console.error("Error checking username", error);
+      console.error("Error updating user information", error);
       setErrors({
-        email: "Error checking username. Please try again.",
+        email: "Error updating user information. Please try again.",
       });
       setIsLoading(false);
       return;
@@ -150,7 +175,6 @@ export default function ContactInformation() {
             label="Email Address"
             value={userInfo.email}
             error={errors.email}
-            onChange={(e) => handleChange("email", e.target.value)}
             disabled
           />
         </div>
@@ -252,15 +276,21 @@ export default function ContactInformation() {
           onChange={(e) => handleChange("biography", e.target.value)}
         />
         {isEditing && (
-          <div className="flex justify-end mt-10 gap-4">
+          <div className="flex justify-end mb-6 mt-0 gap-4">
             <Button
               variant="outlined"
+              onClick={handleCancel}
               className="capitalize border-red-500 text-red-500"
               size="sm"
             >
               Cancel
             </Button>
-            <Button type="submit" className="capitalize bg-green-500" size="sm">
+            <Button
+              type="submit"
+              loading={isLoading}
+              className="capitalize bg-green-500"
+              size="sm"
+            >
               Save Changes
             </Button>
           </div>

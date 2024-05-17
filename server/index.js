@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import "dotenv/config";
 import authRouter from "./routes/auth.route.js";
+import userRouter from "./routes/user.route.js";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
 
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;

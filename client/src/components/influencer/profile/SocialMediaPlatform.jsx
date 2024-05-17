@@ -11,14 +11,16 @@ import {
 import { IoMdClose } from "react-icons/io";
 
 import validator from "validator";
-import { MdCancel } from "react-icons/md";
+import { MdCancel, MdDelete } from "react-icons/md";
 
 import { FaArrowRight } from "react-icons/fa";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { PLATFORM } from "../../../constants";
 import ValidatedInput from "../../ValidatedInput";
 import DynamicTable from "../../DynamicTable";
+import { postToAuthAPI } from "../../../helper/postToAuthAPI";
+import { updateUserProfile } from "../../../redux/user/userSlice";
 
 const MIN_FOLLOWERS = PLATFORM.map((platform) => platform.minFollowers);
 
@@ -31,6 +33,9 @@ const SocialMediaPlatform = () => {
   const [platforms, setPlatforms] = useState(currentUser.platforms);
   const [errors, setErrors] = useState({});
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+
   const closeError = () => {
     setErrors({});
   };
@@ -66,7 +71,6 @@ const SocialMediaPlatform = () => {
       newErrors.url = "Please enter a valid URL.";
     }
 
-    // Convert followerCount to a string before calling trim
     const followerCountStr = String(followerCount).trim();
 
     if (!selectedPlatform || !followerCountStr) {
@@ -84,7 +88,7 @@ const SocialMediaPlatform = () => {
     newData.push({
       name: selectedPlatform,
       url,
-      followerCount: parseInt(followerCountStr, 10), // Ensure followerCount is stored as a number
+      followerCount: parseInt(followerCountStr, 10),
     });
 
     setPlatforms(newData);
@@ -92,27 +96,72 @@ const SocialMediaPlatform = () => {
     handleClose();
   };
 
-  const tableHeaders = ["Platform", "URL", "Followers", ""];
+  const handleDelete = (platformName) => {
+    const newData = platforms.filter((p) => p.name !== platformName);
+    setPlatforms(newData);
+    setIsEditing(true);
+  };
+
+  const tableHeaders = ["Platform", "URL", "Followers", "", ""];
   const tableData = platforms.map(({ name, url, followerCount }) => [
     name,
     url,
     followerCount,
     <Typography
-      as="a"
-      href="#"
       className="text-blue-700 font-medium text-xs"
       onClick={() => handlePlatformSelect(name)}
     >
       Edit
     </Typography>,
+    <Typography onClick={() => handleDelete(name)}>
+      <MdDelete />
+    </Typography>,
   ]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(platforms);
-
+  const handleCancel = () => {
+    setPlatforms(currentUser.platforms);
     setIsEditing(false);
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    const apiPath = `/api/user/update/${currentUser._id}`;
+
+    try {
+      const response = await postToAuthAPI(apiPath, { platforms });
+      if (!response.ok) {
+        throw new Error(
+          `Error updating user information: ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+      if (data.success === false) {
+        const newErrors = {};
+        for (const error of data.errors) {
+          newErrors[error.exist] = error.error;
+        }
+        setErrors(newErrors);
+        setIsLoading(false);
+        return;
+      }
+
+      dispatch(updateUserProfile({ platforms }));
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating user information", error);
+      setErrors({
+        email: "Error updating user information. Please try again.",
+      });
+      setIsLoading(false);
+      return;
+    }
+    setErrors({});
+    setIsLoading(false);
+  };
+
   return (
     <Card
       className="mx-auto w-full max-w-xl"
@@ -120,25 +169,25 @@ const SocialMediaPlatform = () => {
       shadow={false}
     >
       <form
-        className="flex flex-col text-center gap-4  w-full"
+        className="flex flex-col text-center gap-4 w-full"
         onSubmit={handleSubmit}
       >
         <Typography className="text-blue-gray-600" variant="h6">
           Social Media Profile
         </Typography>
-        <div className="flex justify-center  gap-2">
-          <div className="flex justify-center  gap-2">
+        <div className="flex justify-center gap-2">
+          <div className="flex justify-center gap-2">
             {PLATFORM.map((platform) => (
               <Button
                 key={platform.name}
                 variant="outlined"
-                className={`px-2 py-1 flex items-center flex-col `}
+                className="px-2 py-1 flex items-center flex-col"
                 onClick={() => handlePlatformSelect(platform.name)}
               >
                 <platform.icon className="text-xl" />
               </Button>
             ))}
-          </div>{" "}
+          </div>
         </div>
         <Dialog size="md" open={open} onClose={handleClose}>
           <DialogHeader className="justify-between">
@@ -157,7 +206,6 @@ const SocialMediaPlatform = () => {
                 error={errors.url}
                 required
               />
-
               <ValidatedInput
                 type="number"
                 label="Followers"
@@ -167,8 +215,7 @@ const SocialMediaPlatform = () => {
                 required
               />
             </div>
-
-            <div className="flex  justify-end">
+            <div className="flex justify-end">
               <Button
                 className="bg-green-900 mt-4 px-4 capitalize py-2"
                 onClick={handleSave}
@@ -194,15 +241,21 @@ const SocialMediaPlatform = () => {
         <DynamicTable headers={tableHeaders} data={tableData} />
 
         {isEditing && (
-          <div className="flex justify-end mt-10 gap-4">
+          <div className="flex justify-end mb-6 gap-4">
             <Button
               variant="outlined"
+              onClick={handleCancel}
               className="capitalize border-red-500 text-red-500"
               size="sm"
             >
               Cancel
             </Button>
-            <Button type="submit" className="capitalize bg-green-500" size="sm">
+            <Button
+              type="submit"
+              loading={isLoading}
+              className="capitalize bg-green-500"
+              size="sm"
+            >
               Save Changes
             </Button>
           </div>
