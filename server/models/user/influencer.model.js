@@ -45,6 +45,10 @@ const userSchema = new Schema(
     gender: {
       type: String,
     },
+    userType: {
+      type: String,
+      default: "influencer",
+    },
     platforms: [
       {
         name: {

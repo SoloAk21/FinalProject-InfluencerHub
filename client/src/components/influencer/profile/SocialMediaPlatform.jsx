@@ -32,6 +32,7 @@ const SocialMediaPlatform = () => {
   const [followerCount, setFollowerCount] = useState("");
   const [platforms, setPlatforms] = useState(currentUser.platforms);
   const [errors, setErrors] = useState({});
+
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
@@ -128,9 +129,12 @@ const SocialMediaPlatform = () => {
     setIsLoading(true);
 
     const apiPath = `/api/user/update/${currentUser._id}`;
-
+    const userInfo = {
+      platforms: platforms,
+      ...currentUser,
+    };
     try {
-      const response = await postToAuthAPI(apiPath, { platforms });
+      const response = await postToAuthAPI(apiPath, userInfo);
       if (!response.ok) {
         throw new Error(
           `Error updating user information: ${response.statusText}`
@@ -148,7 +152,7 @@ const SocialMediaPlatform = () => {
         return;
       }
 
-      dispatch(updateUserProfile({ platforms }));
+      dispatch(updateUserProfile(userInfo));
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating user information", error);
@@ -163,16 +167,12 @@ const SocialMediaPlatform = () => {
   };
 
   return (
-    <Card
-      className="mx-auto w-full max-w-xl"
-      color="transparent"
-      shadow={false}
-    >
+    <Card className="mt-5" color="transparent" shadow={false}>
       <form
-        className="flex flex-col text-center gap-4 w-full"
+        className="w-full flex flex-col mx-auto max-w-xl gap-4 "
         onSubmit={handleSubmit}
       >
-        <Typography className="text-blue-gray-600" variant="h6">
+        <Typography className="text-blue-gray-600 text-center" variant="h6">
           Social Media Profile
         </Typography>
         <div className="flex justify-center gap-2">

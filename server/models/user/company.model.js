@@ -38,11 +38,13 @@ const CompanySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    userType: {
+      type: String,
+      default: "company",
+    },
     password: {
       type: String,
       required: true,
-      minlength: 8,
-      select: false,
     },
     licenceDocument: {
       type: String,

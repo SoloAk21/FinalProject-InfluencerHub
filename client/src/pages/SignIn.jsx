@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-import { Typography, Input, Button } from "@material-tailwind/react";
+import { Typography, Input, Button, useSelect } from "@material-tailwind/react";
 import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/solid";
 import Header from "../components/Header";
 import { useNavigate, Link } from "react-router-dom";
 import { postToAuthAPI } from "../helper/postToAuthAPI";
 import OAuth from "../components/AOuth"; // Assuming correct import
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { signInSuccess } from "../redux/user/userSlice";
 
 export default function SignIn() {
   const [passwordShown, setPasswordShown] = useState(false);
+  const { currentUser } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -45,6 +46,7 @@ export default function SignIn() {
         const data = await response.json();
         console.log("Login successful:", data);
         dispatch(signInSuccess(data));
+
         navigate("/dashboard");
       } else {
         setError(

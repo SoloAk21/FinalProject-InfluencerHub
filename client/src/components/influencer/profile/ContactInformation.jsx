@@ -37,6 +37,7 @@ export default function ContactInformation() {
     city: currentUser.city || "",
     biography: currentUser.biography || "",
     gender: currentUser.gender || "",
+    ...currentUser,
   };
 
   const [userInfo, setUserInfo] = useState(initialUserInfo);
@@ -110,17 +111,10 @@ export default function ContactInformation() {
       return;
     }
 
-    const updatedData = {};
-    Object.keys(userInfo).forEach((key) => {
-      if (userInfo[key] !== initialUserInfo[key]) {
-        updatedData[key] = userInfo[key];
-      }
-    });
-
     const apiPath = `/api/user/update/${currentUser._id}`;
 
     try {
-      const response = await postToAuthAPI(apiPath, updatedData);
+      const response = await postToAuthAPI(apiPath, userInfo);
 
       if (!response.ok) {
         throw new Error(
@@ -139,7 +133,7 @@ export default function ContactInformation() {
         return;
       }
 
-      dispatch(updateUserProfile(updatedData));
+      dispatch(updateUserProfile(userInfo));
 
       setIsEditing(false);
     } catch (error) {
@@ -160,7 +154,7 @@ export default function ContactInformation() {
       </Typography>
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col mx-auto max-w-xl gap-4 "
+        className="flex w-full flex-col mx-auto max-w-xl gap-4 "
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {" "}

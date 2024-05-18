@@ -5,7 +5,7 @@ import {
   generateToken,
   checkDuplicates,
   saveDocument,
-  checkPaswword,
+  checkPassword,
 } from "../utils/auth.utils.js";
 import { errorHandler } from "../utils/error.js";
 import bcrypt from "bcryptjs";
@@ -109,7 +109,8 @@ export const signIn = async (req, res, next) => {
       return next(errorHandler(400, "Invalid user type"));
     }
 
-    const Model = userType === "company" ? Company : Influencer;
+    const Model = userType === "influencer" ? Influencer : Company;
+
     const user = await Model.findOne({ email });
     if (!user) {
       return next(
@@ -117,7 +118,9 @@ export const signIn = async (req, res, next) => {
       );
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await checkPassword(password, user.password);
+
+    console.log(isMatch);
     if (!isMatch) {
       return next(
         errorHandler(401, "Email or password or user type incorrect")

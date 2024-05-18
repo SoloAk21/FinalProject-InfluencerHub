@@ -11,6 +11,7 @@ import MultiSelect from "../../MultiSelect";
 import { FaArrowRight, FaExclamation } from "react-icons/fa";
 import ValidatedInput from "../../ValidatedInput";
 import validator from "validator";
+import { postToAuthAPI } from "../../../helper/postToAuthAPI";
 
 export default function CompanyInfo({ onNext }) {
   const [companyInfo, setCompanyInfo] = useState({
@@ -18,6 +19,7 @@ export default function CompanyInfo({ onNext }) {
     companyWebsite: "",
     industry: [],
     companyDescription: "",
+    userType: "company",
   });
   const [errors, setErrors] = useState({
     companyName: "",
@@ -55,9 +57,13 @@ export default function CompanyInfo({ onNext }) {
       setIsLoading(false);
       return;
     }
+
+    const checkData = { companyName: companyInfo.companyName };
     const apiPath = "/api/auth/companies/check";
 
     try {
+      const response = await postToAuthAPI(apiPath, { checkData });
+
       const data = await response.json();
 
       if (data.success === false) {

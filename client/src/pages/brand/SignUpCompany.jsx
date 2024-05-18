@@ -11,6 +11,7 @@ export default function SignUpCompany() {
 
   const handleNext = (data) => {
     setFormData({ ...formData, ...data });
+
     setActiveStep((cur) => cur + 1);
   };
 

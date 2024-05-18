@@ -10,6 +10,7 @@ export default function SignUpInfluencer() {
   const [formData, setFormData] = useState({});
 
   const handleNext = (data) => {
+    setFormData.userType = "influencer";
     setFormData({ ...formData, ...data });
     setActiveStep((cur) => cur + 1);
   };

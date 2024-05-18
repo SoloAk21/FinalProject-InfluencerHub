@@ -1,53 +1,74 @@
 import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
 import Influencer from "../models/user/influencer.model.js";
+import Company from "../models/user/company.model.js";
 
 export const test = (req, res) => {
   res.json({
-    message: "Api route is working!",
+    message: "API route is working!",
   });
 };
 
 export const updateUser = async (req, res, next) => {
-  if (req.user.userId !== req.params.id) {
-    return next(errorHandler(401, "You can only update your own account!"));
-  }
-
   try {
-    const { username, email, ...updateFields } = req.body;
+    const { email, userType, ...updateFields } = req.body;
+    const userId = req.params.id;
 
-    const currentUser = await Influencer.findById(req.user.userId);
+    console.log(userType);
+    const currentUser = await (userType === "influencer"
+      ? Influencer.findById(userId)
+      : Company.findById(userId));
 
     if (!currentUser) {
       return next(errorHandler(404, "User not found"));
     }
 
-    if (username) {
-      const normalizedUsername = username.toLowerCase().replace(/\s/g, "");
-      if (normalizedUsername !== currentUser.username) {
-        const usernameFound = await Influencer.findOne({
-          username: normalizedUsername,
-          _id: { $ne: currentUser._id }, // Exclude current user
-        });
-        if (usernameFound) {
-          return next(errorHandler(400, "Username already exists"));
-        }
-        updateFields.username = normalizedUsername;
+    // Check if the user is authorized to update their own account
+    if (req.user.userId !== userId) {
+      return next(errorHandler(401, "You can only update your own account!"));
+    }
+
+    // Check if the username/company name is provided and handle uniqueness
+    if (updateFields.username && userType === "influencer") {
+      const normalizedUsername = updateFields.username
+        .toLowerCase()
+        .replace(/\s/g, "");
+
+      const usernameFound = await Influencer.findOne({
+        username: normalizedUsername,
+        _id: { $ne: userId }, // Exclude current user
+      });
+
+      if (usernameFound) {
+        return next(errorHandler(400, "Username already exists"));
       }
+
+      updateFields.username = normalizedUsername;
     }
 
-    const updatedUser = await Influencer.findByIdAndUpdate(
-      req.params.id,
-      { $set: updateFields },
-      { new: true }
-    );
+    if (updateFields.companyName && userType === "company") {
+      const normalizedCompanyName = updateFields.companyName
+        .toLowerCase()
+        .replace(/\s/g, "");
 
-    if (!updatedUser) {
-      return next(errorHandler(500, "Failed to update user"));
+      const companyNameFound = await Company.findOne({
+        companyName: normalizedCompanyName,
+        _id: { $ne: userId }, // Exclude current user
+      });
+
+      if (companyNameFound) {
+        return next(errorHandler(400, "Company name already exists"));
+      }
+
+      updateFields.companyName = normalizedCompanyName;
     }
+
+    // Update user information
+    Object.assign(currentUser, updateFields);
+    await currentUser.save();
 
     // Omitting the password field
-    const { password, ...rest } = updatedUser._doc;
+    const { password, ...rest } = currentUser._doc;
 
     res.status(200).json(rest);
   } catch (error) {
