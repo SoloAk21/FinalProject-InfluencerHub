@@ -12,4 +12,6 @@ export const INDUSTRY = [
   "Other",
 ];
 
+export const COLLABORATION_STATUS = ["pending", "accepted", "declined"];
+
 export const CONTENT = INDUSTRY;
