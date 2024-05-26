@@ -10,6 +10,8 @@ import SignIn from "./pages/SignIn";
 import PrivateRoute from "./components/PrivateRoute";
 import UserProfile from "./pages/influencer/UserProfile";
 import CompanyProfile from "./pages/brand/CompanyProfile";
+import MainStructure from "./pages/brand/MainStructure";
+import Search from "./pages/brand/Search";
 
 export default function App() {
   return (
@@ -25,6 +27,7 @@ export default function App() {
             path="/influencer/google"
             element={<OAuth userType="influencer" />}
           />
+
           <Route path="/influencer/signup" element={<SignUpInfluencer />} />
           <Route
             path="/registration-success"
@@ -34,7 +37,13 @@ export default function App() {
           <Route path="/userprofile" element={<UserProfile />} />
           <Route path="/companyprofile" element={<CompanyProfile />} />
 
-          <Route element={<PrivateRoute />}></Route>
+          <Route element={<PrivateRoute />}>
+            <Route
+              path="/profile"
+              element={<MainStructure content={<CompanyProfile />} />}
+            />
+            <Route path="/search" element={<Search />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </div>
