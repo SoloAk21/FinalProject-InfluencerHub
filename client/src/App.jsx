@@ -12,6 +12,8 @@ import UserProfile from "./pages/influencer/UserProfile";
 import CompanyProfile from "./pages/brand/CompanyProfile";
 import MainStructure from "./pages/brand/MainStructure";
 import Search from "./pages/brand/Search";
+import InfluencerDetail from "./pages/brand/InfluencerDetail";
+import Message from "./pages/Message";
 
 export default function App() {
   return (
@@ -43,6 +45,8 @@ export default function App() {
               element={<MainStructure content={<CompanyProfile />} />}
             />
             <Route path="/search" element={<Search />} />
+            <Route path="/influencer/:id" element={<InfluencerDetail />} />
+            <Route path="/message" element={<Message />} />
           </Route>
         </Routes>
       </BrowserRouter>

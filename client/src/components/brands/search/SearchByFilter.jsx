@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Checkbox, Select } from "@material-tailwind/react";
 import { RxCross2 } from "react-icons/rx";
 import { AGE_GROUP, INDUSTRY, PLATFORM } from "../../../constants";
-import { InfluencerProfile } from "../InfluencerProfile";
+import { InfluencerProfile } from "./InfluencerProfile";
 
 export default function SearchByFilter() {
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);

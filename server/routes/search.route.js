@@ -1,5 +1,5 @@
 import express from "express";
-import { test } from "../controllers/search.controller.js";
+import { getInfluencerDetail, test } from "../controllers/search.controller.js";
 import { verifyToken } from "../utils/verifyUser.js";
 import {
   getInfluencersByUsername,
@@ -12,5 +12,6 @@ router.get("/test", test);
 
 router.get("/search", verifyToken, getInfluencersByUsername);
 router.get("/filter", verifyToken, getInfluencersByFilters);
+router.get("/details/:id", verifyToken, getInfluencerDetail);
 
 export default router;

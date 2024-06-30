@@ -6,6 +6,8 @@ import authRouter from "./routes/auth.route.js";
 import userRouter from "./routes/user.route.js";
 import searchRouter from "./routes/search.route.js";
 import collaborationRouter from "./routes/collaboration.route.js";
+import messageRouter from "./routes/message.route.js";
+import conversationRouter from "./routes/conversation.route.js";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -25,6 +27,8 @@ app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/influencers", searchRouter);
 app.use("/api/collaborations", collaborationRouter);
+app.use("/api/messages", messageRouter);
+app.use("/api/conversations", conversationRouter);
 
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;

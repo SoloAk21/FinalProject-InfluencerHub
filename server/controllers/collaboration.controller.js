@@ -65,3 +65,27 @@ export const respondToCollaborationRequest = async (req, res) => {
     res.status(400).json({ error: error.message, id: influencer.userId });
   }
 };
+
+export const findCollabIdBetweenUsers = async (req, res) => {
+  const { userId1, userId2 } = req.body;
+  try {
+    const collaboration = await Collaboration.findOne({
+      $or: [
+        { fromUser: userId1, toUser: userId2 },
+        { fromUser: userId2, toUser: userId1 },
+      ],
+    });
+
+    if (collaboration) {
+      // Send the collaboration ID as JSON response
+      res.status(200).json({ collaborationId: collaboration._id });
+    } else {
+      // Handle case where no collaboration is found
+      res.status(404).json({ error: "No collaboration found" });
+    }
+  } catch (error) {
+    // Handle error appropriately, e.g., log it or throw it
+    console.error("Error finding collaboration:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

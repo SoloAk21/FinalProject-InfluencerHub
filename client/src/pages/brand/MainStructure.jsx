@@ -11,7 +11,7 @@ export default function MainStructure({ content }) {
 
   return (
     <div className="">
-      <div className="sticky top-0 bg-white shadow-lg md:py-2 md:px-4 z-10">
+      <div className="sticky top-0 bg-white shadow-lg   z-10">
         <div className="flex flex-row items-center justify-between px-2 pt-4 pb-2">
           <HiOutlineMenuAlt2
             className="md:hidden"

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Checkbox, Input, Select } from "@material-tailwind/react";
 import { FaAngleDown, FaCross, FaSearch } from "react-icons/fa";
 import { RxCross2 } from "react-icons/rx";
-import { InfluencerProfile } from "../InfluencerProfile";
+import { InfluencerProfile } from "./InfluencerProfile";
 // import { InfluencerProfile } from "../InfluencerProfile";
 
 export default function SearchByUsername() {

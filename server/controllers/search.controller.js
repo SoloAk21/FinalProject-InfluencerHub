@@ -12,8 +12,6 @@ export const getInfluencersByUsername = async (req, res) => {
 
     let query = {};
     if (term) {
-      // Use a regular expression to search for a case-insensitive match
-      // and check across username, firstName, and lastName fields
       query = {
         $or: [
           { username: { $regex: term, $options: "i" } },
@@ -120,4 +118,23 @@ const calculateDateOfBirth = (age) => {
     today.getDate()
   );
   return birthDate;
+};
+
+export const getInfluencerDetail = async (req, res) => {
+  try {
+    const influencerId = req.params.id; // Extracts ID from URL
+    const influencer = await Influencer.findById(influencerId).select(
+      "-_id -createdAt -password -updatedAt -__v -userType -active"
+    ); // Excluding unwanted fields
+    if (!influencer) {
+      return res.status(404).json({ message: "Influencer not found" });
+    }
+
+    res.status(200).json(influencer);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching influencer details",
+      error: error.message,
+    });
+  }
 };
