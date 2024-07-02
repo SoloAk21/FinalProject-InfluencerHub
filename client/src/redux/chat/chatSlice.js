@@ -32,7 +32,7 @@ export const chatSlice = createSlice({
       state.loading = true;
     },
     setSendMessageSuccess: (state, action) => {
-      state.message = action.payload;
+      state.message = [...state.message, action.payload];
       state.loading = false;
       state.error = null;
     },
@@ -50,11 +50,9 @@ export const {
   setConversationsSuccess,
   setConversationsFailure,
   setSelectedParticipant,
-
   setSendMessageFailure,
   setSendMessageSuccess,
   setSendMessageStart,
-
   resetChatState,
 } = chatSlice.actions;
 

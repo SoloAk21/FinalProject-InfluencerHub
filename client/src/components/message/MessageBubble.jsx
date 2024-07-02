@@ -23,6 +23,10 @@ export default function MessageBubble() {
       conversation.participants[0].participant._id === selectedParticipant
   );
 
+  if (!participantData) {
+    return <div>No messages found for the selected participant.</div>;
+  }
+
   let prevSender = null;
   return (
     <div className="">

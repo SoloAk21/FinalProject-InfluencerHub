@@ -4,6 +4,7 @@ import Message from "../models/message.model.js";
 import Influencer from "../models/user/influencer.model.js";
 import Company from "../models/user/company.model.js";
 import Collaboration from "../models/collaboration.model.js";
+import { getReceiverSocketId, io } from "../socket/socket.js";
 
 const getUserModel = async (userId) => {
   const influencer = await Influencer.findById(userId);
@@ -86,6 +87,12 @@ export const sendMessage = async (req, res) => {
     res
       .status(201)
       .json({ message: "Message sent successfully", data: message });
+
+    // SOCKET IO FUNCTIONALITY
+    const receiverSocketId = getReceiverSocketId(recipient);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", message);
+    }
   } catch (error) {
     console.log(error);
     res
@@ -110,7 +117,11 @@ export const receiveMessage = async (req, res) => {
 
     message.read = true;
     await message.save();
-
+    // SOCKET IO FUNCTIONALITY
+    const receiverSocketId = getReceiverSocketId(recipient);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", message);
+    }
     res.status(200).json({ message: "Message received", data: message });
   } catch (error) {
     console.error("Error receiving message:", error);

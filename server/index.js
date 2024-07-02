@@ -1,4 +1,5 @@
 import express from "express";
+
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import "dotenv/config";
@@ -8,17 +9,24 @@ import searchRouter from "./routes/search.route.js";
 import collaborationRouter from "./routes/collaboration.route.js";
 import messageRouter from "./routes/message.route.js";
 import conversationRouter from "./routes/conversation.route.js";
-const app = express();
-const PORT = process.env.PORT || 3000;
 
+import cors from "cors";
+import { app, server } from "./socket/socket.js";
+
+const PORT = process.env.PORT || 5000;
+
+// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_DB_URL)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Could not connect to MongoDB", err));
 
+// Middleware
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
+// API Routes
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
@@ -30,15 +38,17 @@ app.use("/api/collaborations", collaborationRouter);
 app.use("/api/messages", messageRouter);
 app.use("/api/conversations", conversationRouter);
 
+// Error handling middleware
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;
   res.status(statusCode).json({
     success: false,
     statusCode,
-    message: error.message || "Server creating error",
+    message: error.message || "Server error",
   });
 });
 
-app.listen(PORT, () => {
+// Start the server
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
