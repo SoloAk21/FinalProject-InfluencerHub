@@ -14,6 +14,8 @@ import MainStructure from "./pages/brand/MainStructure";
 import Search from "./pages/brand/Search";
 import InfluencerDetail from "./pages/brand/InfluencerDetail";
 import Message from "./pages/Message";
+import CreateCampaign from "./pages/brand/CreateCampaign";
+import Payment from "./pages/brand/Payment";
 
 export default function App() {
   return (
@@ -21,6 +23,9 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/company/signup" element={<SignUpCompany />} />
+          <Route path="/create-campaign" element={<CreateCampaign />} />
+          <Route path="/payment" element={<Payment />} />
+
           <Route
             path="/company/google"
             element={<OAuth userType="company" />}

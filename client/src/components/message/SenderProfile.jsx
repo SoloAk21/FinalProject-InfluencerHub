@@ -3,6 +3,7 @@ import { Avatar, Menu, MenuItem } from "@material-tailwind/react";
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export default function SenderProfile({ senderImage }) {
   const selectedParticipant = useSelector(
@@ -13,7 +14,7 @@ export default function SenderProfile({ senderImage }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuButtonRef = useRef(null);
   const menuRef = useRef(null);
-
+  const navigate = useNavigate();
   const participantData = useMemo(
     () =>
       conversations.find(
@@ -89,9 +90,9 @@ export default function SenderProfile({ senderImage }) {
               <MenuItem
                 as="button"
                 className="block px-4 py-2 text-sm"
-                onClick={() => console.log("Menu Item 1")}
+                onClick={() => navigate("/create-campaign")}
               >
-                Menu Item 1
+                Create campaign
               </MenuItem>
               <MenuItem
                 as="button"
