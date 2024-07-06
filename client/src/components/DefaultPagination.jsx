@@ -16,6 +16,7 @@ const DefaultPagination = ({ active, setActive, totalPages }) => {
   return (
     <div className="flex items-end justify-end gap-2 lg:gap-4">
       <Button
+        size="sm"
         variant="text"
         className="flex items-center gap-2"
         onClick={prev}
@@ -36,6 +37,7 @@ const DefaultPagination = ({ active, setActive, totalPages }) => {
         ))}
       </div>
       <Button
+        size="sm"
         variant="text"
         className="flex items-center gap-1"
         onClick={next}
