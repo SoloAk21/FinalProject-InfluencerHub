@@ -43,7 +43,6 @@ export const acceptPayment = async (req, res) => {
         }
       );
 
-      console.log(response);
       if (!response.ok) {
         const errorBody = await response.json();
         console.error("Chapa API Error:", errorBody); // Log detailed error response

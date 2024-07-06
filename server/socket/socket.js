@@ -31,6 +31,11 @@ io.on("connection", (socket) => {
     delete userSocketMap[userId];
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
+
+  socket.on("send_message", (message) => {
+    // Emit the message to all connected clients
+    io.emit("receive_message", message);
+  });
 });
 
 export { app, io, server };

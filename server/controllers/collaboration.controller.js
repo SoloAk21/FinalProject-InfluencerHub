@@ -38,31 +38,34 @@ export const checkCollabStatus = async (req, res) => {
 };
 export const respondToCollaborationRequest = async (req, res) => {
   try {
-    const { requestId, status } = req.body;
-    const influencer = req.user;
+    const { collaborationId, status } = req.body;
+    console.log(req.body);
+    const influencerId = req.user.userId;
 
-    if (!influencer || !influencer.userId) {
+    if (!influencerId) {
       return res.status(403).json({ error: "Unauthorized" });
     }
 
-    const collaboration = await Collaboration.findById(requestId);
+    const collaboration = await Collaboration.findById(collaborationId);
 
     if (!collaboration) {
       return res.status(404).json({ error: "Collaboration request not found" });
     }
 
-    if (collaboration.toUser.toString() !== influencer.userId.toString()) {
+    if (collaboration.toUser.toString() !== influencerId.toString()) {
       return res
         .status(403)
         .json({ error: "You do not have permission to perform this action" });
     }
 
-    collaboration.status = status;
+    collaboration.status = status === "accept" ? "accepted" : "rejected";
     await collaboration.save();
 
     res.status(200).json(collaboration);
+    console.log(collaboration);
   } catch (error) {
-    res.status(400).json({ error: error.message, id: influencer.userId });
+    console.log(error);
+    res.status(400).json({ error: error.message, id: influencerId });
   }
 };
 
@@ -89,3 +92,53 @@ export const findCollabIdBetweenUsers = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const getCollaborationsByUserType = async (req, res) => {
+  const { model, userId } = req.user;
+  const page = parseInt(req.query.page) || 1; // Current page, default to 1
+  const pageSize = parseInt(req.query.pageSize) || 10; // Number of items per page, default to 10
+  const userType = model.toLowerCase();
+
+  try {
+    const page = parseInt(req.query.page) || 1; // Current page, default to 1
+    const pageSize = parseInt(req.query.pageSize) || 10; // Number of items per page, default to 10
+
+    let collaborations = [];
+    let totalCollaborations = 0;
+    let totalPages = 0;
+
+    if (userType === "influencer") {
+      totalCollaborations = await Collaboration.countDocuments({
+        toUser: userId,
+      });
+      totalPages = Math.ceil(totalCollaborations / pageSize);
+
+      collaborations = await Collaboration.find({ toUser: userId })
+        .populate("fromUser toUser")
+        .skip((page - 1) * pageSize)
+        .limit(pageSize);
+    } else if (userType === "company") {
+      totalCollaborations = await Collaboration.countDocuments({
+        fromUser: userId,
+      });
+      totalPages = Math.ceil(totalCollaborations / pageSize);
+
+      collaborations = await Collaboration.find({ fromUser: userId })
+        .populate("fromUser toUser")
+        .skip((page - 1) * pageSize)
+        .limit(pageSize);
+    } else {
+      return res.status(400).json({ message: "Invalid user type" });
+    }
+
+    res.status(200).json({
+      collaborations: collaborations,
+      totalPages: totalPages,
+      currentPage: page,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// collaborationController.js

@@ -14,6 +14,6 @@ export const INDUSTRY = [
 
 export const STATUS = ["pending", "completed", "active"];
 
-export const COLLABORATION_STATUS = ["pending", "accepted", "declined"];
+export const COLLABORATION_STATUS = ["pending", "accepted", "rejected"];
 
 export const CONTENT = INDUSTRY;

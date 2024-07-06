@@ -20,6 +20,8 @@ import CampaignDetails from "./pages/brand/CampaignDetails";
 import PrivateRoute from "./components/PrivateRoute";
 import OAuth from "./components/AOuth";
 
+import ManageCollaborations from "./pages/ManageCollaborations";
+
 export default function App() {
   return (
     <div className="max-w-screen-xl mx-auto">
@@ -53,6 +55,7 @@ export default function App() {
             <Route path="/search" element={<Search />} />
             <Route path="/influencer/:id" element={<InfluencerDetail />} />
             <Route path="/message" element={<Message />} />
+            <Route path="/collaborations" element={<ManageCollaborations />} />
           </Route>
 
           {/* Routes accessible only to company */}
