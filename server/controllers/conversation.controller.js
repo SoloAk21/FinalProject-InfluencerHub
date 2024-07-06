@@ -5,6 +5,7 @@ export const getConversations = async (req, res, next) => {
   try {
     const userId = req.user.userId;
     const userModel = req.user.model;
+
     // Find all conversations involving the user
     let conversations = await Conversation.find({
       "participants.participant": userId,

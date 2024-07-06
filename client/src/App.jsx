@@ -16,6 +16,8 @@ import InfluencerDetail from "./pages/brand/InfluencerDetail";
 import Message from "./pages/Message";
 import CreateCampaign from "./pages/brand/CreateCampaign";
 import Payment from "./pages/brand/Payment";
+import ManageCampaign from "./pages/brand/ManageCampaign";
+import CampaignDetails from "./pages/brand/CampaignDetails";
 
 export default function App() {
   return (
@@ -25,6 +27,8 @@ export default function App() {
           <Route path="/company/signup" element={<SignUpCompany />} />
           <Route path="/create-campaign" element={<CreateCampaign />} />
           <Route path="/payment" element={<Payment />} />
+          <Route path="/manage-campaign" element={<ManageCampaign />} />
+          <Route path="/detail-campaign" element={<CampaignDetails />} />
 
           <Route
             path="/company/google"

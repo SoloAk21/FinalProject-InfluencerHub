@@ -44,7 +44,6 @@ export default function SignIn() {
       const response = await postToAuthAPI(apiPath, formData);
       if (response.ok) {
         const data = await response.json();
-        console.log("Login successful:", data);
         dispatch(signInSuccess(data));
 
         navigate("/dashboard");

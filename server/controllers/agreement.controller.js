@@ -27,6 +27,33 @@ export const getAgreementById = async (req, res) => {
   }
 };
 
+export const getAgreementsByCampaignId = async (req, res) => {
+  const { campaignId } = req.params;
+
+  try {
+    const agreements = await Agreement.find({ campaign: campaignId }).populate({
+      path: "campaign",
+      populate: [
+        {
+          path: "influencer",
+          model: "Influencer",
+        },
+        { path: "company", model: "Company" },
+      ],
+    });
+
+    if (!agreements.length) {
+      return res
+        .status(404)
+        .json({ message: "No agreements found for this campaign." });
+    }
+
+    res.status(200).json(agreements);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching agreements.", error });
+  }
+};
+
 // Update Agreement by ID
 export const updateAgreement = async (req, res) => {
   const { agreementId } = req.params;

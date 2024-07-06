@@ -20,9 +20,8 @@ function InfluencerDetail() {
   useEffect(() => {
     const fetchInfluencer = async () => {
       try {
-        console.log(id);
         const response = await fetch(`/api/influencers/details/${id}`);
-        console.log(response);
+
         if (response.ok) {
           const data = await response.json();
           setInfluencer(data);

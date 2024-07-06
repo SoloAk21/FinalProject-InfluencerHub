@@ -1,4 +1,5 @@
 export const createCampaign = async (campaignData) => {
+  console.log(campaignData);
   try {
     const response = await fetch(`api/campaigns/create`, {
       method: "POST",
