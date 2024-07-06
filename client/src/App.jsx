@@ -1,13 +1,12 @@
+// App.jsx
+
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import SignUpCompany from "./pages/brand/SignUpCompany";
-
-import RegistrationSuccess from "./pages/RegistrationSuccess";
 import SignUpInfluencer from "./pages/influencer/SignUpInfluencer";
-import OAuth from "./components/AOuth";
+import RegistrationSuccess from "./pages/RegistrationSuccess";
 import SignIn from "./pages/SignIn";
-import PrivateRoute from "./components/PrivateRoute";
 import UserProfile from "./pages/influencer/UserProfile";
 import CompanyProfile from "./pages/brand/CompanyProfile";
 import MainStructure from "./pages/brand/MainStructure";
@@ -18,18 +17,24 @@ import CreateCampaign from "./pages/brand/CreateCampaign";
 import Payment from "./pages/brand/Payment";
 import ManageCampaign from "./pages/brand/ManageCampaign";
 import CampaignDetails from "./pages/brand/CampaignDetails";
+import PrivateRoute from "./components/PrivateRoute";
+import OAuth from "./components/AOuth";
 
 export default function App() {
   return (
     <div className="max-w-screen-xl mx-auto">
       <BrowserRouter>
         <Routes>
+          {/* Public Routes */}
           <Route path="/company/signup" element={<SignUpCompany />} />
-          <Route path="/create-campaign" element={<CreateCampaign />} />
-          <Route path="/payment" element={<Payment />} />
-          <Route path="/manage-campaign" element={<ManageCampaign />} />
-          <Route path="/detail-campaign" element={<CampaignDetails />} />
+          <Route path="/influencer/signup" element={<SignUpInfluencer />} />
+          <Route
+            path="/registration-success"
+            element={<RegistrationSuccess />}
+          />
+          <Route path="/signin" element={<SignIn />} />
 
+          {/* OAuth Redirects */}
           <Route
             path="/company/google"
             element={<OAuth userType="company" />}
@@ -39,16 +44,8 @@ export default function App() {
             element={<OAuth userType="influencer" />}
           />
 
-          <Route path="/influencer/signup" element={<SignUpInfluencer />} />
-          <Route
-            path="/registration-success"
-            element={<RegistrationSuccess />}
-          />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/userprofile" element={<UserProfile />} />
-          <Route path="/companyprofile" element={<CompanyProfile />} />
-
-          <Route element={<PrivateRoute />}>
+          {/* Routes accessible to both company and influencer */}
+          <Route element={<PrivateRoute userTypeAllowed={null} />}>
             <Route
               path="/profile"
               element={<MainStructure content={<CompanyProfile />} />}
@@ -56,6 +53,20 @@ export default function App() {
             <Route path="/search" element={<Search />} />
             <Route path="/influencer/:id" element={<InfluencerDetail />} />
             <Route path="/message" element={<Message />} />
+          </Route>
+
+          {/* Routes accessible only to company */}
+          <Route element={<PrivateRoute userTypeAllowed="company" />}>
+            <Route path="/create-campaign" element={<CreateCampaign />} />
+            <Route path="/payment" element={<Payment />} />
+            <Route path="/manage-campaign" element={<ManageCampaign />} />
+            <Route path="/detail-campaign" element={<CampaignDetails />} />
+            <Route path="/companyprofile" element={<CompanyProfile />} />
+          </Route>
+
+          {/* Routes accessible only to influencer */}
+          <Route element={<PrivateRoute userTypeAllowed="influencer" />}>
+            <Route path="/userprofile" element={<UserProfile />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -1,8 +1,17 @@
+// components/PrivateRoute.jsx
+
 import React from "react";
 import { useSelector } from "react-redux";
-import { Navigate, Outlet } from "react-router-dom";
+import { Route, Navigate, Outlet } from "react-router-dom";
 
-export default function PrivateRoute() {
+export default function PrivateRoute({ userTypeAllowed, ...props }) {
   const { currentUser } = useSelector((state) => state.user);
-  return <>{currentUser ? <Outlet /> : <Navigate to="/" />}</>;
+  const isAuthenticated =
+    currentUser && currentUser.userType === userTypeAllowed;
+
+  return isAuthenticated || userTypeAllowed === null ? (
+    <Outlet {...props} />
+  ) : (
+    <Navigate to="/signin" />
+  );
 }
