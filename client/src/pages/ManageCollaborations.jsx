@@ -25,7 +25,7 @@ import ConfirmationDialog from "../components/ConfirmationDialog";
 import { postToAuthAPI } from "../helper/postToAuthAPI";
 import { useNavigate } from "react-router-dom";
 import ViewDetailDialog from "../components/ViewDetailDialog";
-
+import { RiUserUnfollowFill } from "react-icons/ri";
 const TABS = [
   { label: "All", value: "all" },
   { label: "Accepted", value: "accepted" },
@@ -115,15 +115,35 @@ const ManageCollaborations = () => {
         "", // Accept/Reject buttons column
       ];
     } else if (currentUser.userType === "company") {
-      return ["Influencer", "Status", "Requested At"];
+      return ["Influencer", "Status", "Requested At", ""];
     }
     return [];
   };
 
   const openDialog = (action, collaborationId) => {
-    const dialogTitle =
-      action === "accept" ? "Confirm Acceptance" : "Confirm Rejection";
-    const dialogMessage = `Are you sure you want to ${action} this collaboration request? This action cannot be undone.`;
+    let dialogTitle = "";
+    let dialogMessage = "";
+
+    switch (action) {
+      case "accept":
+        dialogTitle = "Confirm Acceptance";
+        dialogMessage =
+          "Are you sure you want to accept this collaboration request? This action cannot be undone.";
+        break;
+      case "reject":
+        dialogTitle = "Confirm Rejection";
+        dialogMessage =
+          "Are you sure you want to reject this collaboration request? This action cannot be undone.";
+        break;
+      case "request-back":
+        dialogTitle = "Confirm Request Back";
+        dialogMessage =
+          "Are you sure you want to request back this collaboration? This action cannot be undone.";
+        break;
+      default:
+        return;
+    }
+
     setState((prevState) => ({
       ...prevState,
       dialogOpen: true,
@@ -374,6 +394,31 @@ const ManageCollaborations = () => {
                                     </div>
                                   </td>
                                 )}
+                                {currentUser.userType === "company" && (
+                                  <td className={classes}>
+                                    <div className="flex gap-6">
+                                      <Tooltip
+                                        content="Request Back Collaboration"
+                                        className="px-4"
+                                      >
+                                        <IconButton
+                                          variant="text"
+                                          color="red"
+                                          onClick={() =>
+                                            openDialog("request-back", _id)
+                                          }
+                                        >
+                                          <div className="flex flex-col items-center gap-2 px-2">
+                                            <RiUserUnfollowFill className="h-3 w-3" />
+                                            <span className="text-[10px] text-red-600">
+                                              Request Back
+                                            </span>
+                                          </div>
+                                        </IconButton>
+                                      </Tooltip>
+                                    </div>
+                                  </td>
+                                )}
                               </tr>
                             );
                           }
@@ -403,6 +448,7 @@ const ManageCollaborations = () => {
             isOpen={isOpen}
             onClose={handleClose}
             userInfo={selectedUser}
+            currentUserType={currentUser.userType}
           />
         </div>
       }

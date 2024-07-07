@@ -39,10 +39,9 @@ export const checkCollabStatus = async (req, res) => {
 export const respondToCollaborationRequest = async (req, res) => {
   try {
     const { collaborationId, status } = req.body;
-    console.log(req.body);
-    const influencerId = req.user.userId;
+    const userId = req.user.userId;
 
-    if (!influencerId) {
+    if (!userId) {
       return res.status(403).json({ error: "Unauthorized" });
     }
 
@@ -52,7 +51,20 @@ export const respondToCollaborationRequest = async (req, res) => {
       return res.status(404).json({ error: "Collaboration request not found" });
     }
 
-    if (collaboration.toUser.toString() !== influencerId.toString()) {
+    if (status === "request-back") {
+      if (collaboration.fromUser.toString() !== userId.toString()) {
+        return res.status(403).json({
+          error:
+            "You do not have permission to request back this collaboration",
+        });
+      }
+      await collaboration.deleteOne();
+      return res
+        .status(200)
+        .json({ message: "Collaboration deleted successfully" });
+    }
+
+    if (collaboration.toUser.toString() !== userId.toString()) {
       return res
         .status(403)
         .json({ error: "You do not have permission to perform this action" });
@@ -62,10 +74,9 @@ export const respondToCollaborationRequest = async (req, res) => {
     await collaboration.save();
 
     res.status(200).json(collaboration);
-    console.log(collaboration);
   } catch (error) {
     console.log(error);
-    res.status(400).json({ error: error.message, id: influencerId });
+    res.status(400).json({ error: error.message, id: userId });
   }
 };
 
@@ -95,8 +106,6 @@ export const findCollabIdBetweenUsers = async (req, res) => {
 
 export const getCollaborationsByUserType = async (req, res) => {
   const { model, userId } = req.user;
-  const page = parseInt(req.query.page) || 1; // Current page, default to 1
-  const pageSize = parseInt(req.query.pageSize) || 10; // Number of items per page, default to 10
   const userType = model.toLowerCase();
 
   try {
@@ -142,3 +151,27 @@ export const getCollaborationsByUserType = async (req, res) => {
 };
 
 // collaborationController.js
+export const getCollaborations = async (req, res) => {
+  const { model, userId } = req.user;
+  const userType = model.toLowerCase();
+
+  try {
+    let collaborations = [];
+
+    if (userType === "influencer") {
+      collaborations = await Collaboration.find({ toUser: userId }).populate(
+        "fromUser toUser"
+      );
+    } else if (userType === "company") {
+      collaborations = await Collaboration.find({ fromUser: userId }).populate(
+        "fromUser toUser"
+      );
+    } else {
+      return res.status(400).json({ message: "Invalid user type" });
+    }
+
+    res.status(200).json({ collaborations });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
