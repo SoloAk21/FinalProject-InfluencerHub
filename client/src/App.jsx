@@ -21,6 +21,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import OAuth from "./components/AOuth";
 
 import ManageCollaborations from "./pages/ManageCollaborations";
+import CompanyDetail from "./pages/influencer/CompanyDetail";
 
 export default function App() {
   return (
@@ -65,11 +66,17 @@ export default function App() {
             <Route path="/manage-campaign" element={<ManageCampaign />} />
             <Route path="/detail-campaign" element={<CampaignDetails />} />
             <Route path="/companyprofile" element={<CompanyProfile />} />
+            <Route
+              path="/detail-influencer/:id"
+              element={<InfluencerDetail />}
+            />
           </Route>
 
           {/* Routes accessible only to influencer */}
           <Route element={<PrivateRoute userTypeAllowed="influencer" />}>
             <Route path="/userprofile" element={<UserProfile />} />
+
+            <Route path="/detail-company/:id" element={<CompanyDetail />} />
           </Route>
         </Routes>
       </BrowserRouter>

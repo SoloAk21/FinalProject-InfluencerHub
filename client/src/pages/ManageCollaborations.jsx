@@ -23,6 +23,8 @@ import DefaultPagination from "../components/DefaultPagination";
 import { formatRelativeTime } from "../helper/formatRelativeTime";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import { postToAuthAPI } from "../helper/postToAuthAPI";
+import { useNavigate } from "react-router-dom";
+import ViewDetailDialog from "../components/ViewDetailDialog";
 
 const TABS = [
   { label: "All", value: "all" },
@@ -48,8 +50,20 @@ const ManageCollaborations = () => {
     dialogMessage: "",
     selectedCollaborationId: null,
   });
-
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const handleOpen = (user) => {
+    setSelectedUser(user);
+    setIsOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+  };
   const fetchCollaborations = useCallback(async () => {
     try {
       const response = await fetch(
@@ -90,22 +104,6 @@ const ManageCollaborations = () => {
       ...prevState,
       activePage: page,
     }));
-  };
-
-  const fetchCollaborationById = async (collaborationId) => {
-    try {
-      const response = await fetch(`/api/collaborations/${collaborationId}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch collaboration details");
-      }
-      const data = await response.json();
-      setState((prevState) => ({
-        ...prevState,
-        selectedCollaboration: data,
-      }));
-    } catch (error) {
-      console.error("Error fetching collaboration details:", error);
-    }
   };
 
   const tableHead = () => {
@@ -259,13 +257,24 @@ const ManageCollaborations = () => {
                                 ? fromUser.companyName
                                 : `${toUser.firstName} ${toUser.lastName} `;
 
+                            const selectedUser =
+                              currentUser.userType === "influencer"
+                                ? fromUser
+                                : toUser;
+                            currentUser.userType === "influencer"
+                              ? fromUser.companyName
+                              : `${toUser.firstName} ${toUser.lastName} `;
+
                             const userProfile =
                               "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
 
                             return (
                               <tr key={_id}>
                                 <td className={classes}>
-                                  <div className="flex items-center gap-3">
+                                  <div
+                                    className="flex items-center gap-3 hover:bg-gray-50"
+                                    onClick={() => handleOpen(selectedUser)}
+                                  >
                                     <Avatar
                                       src={userProfile}
                                       alt={name}
@@ -389,6 +398,11 @@ const ManageCollaborations = () => {
             onConfirm={handleCollaborationAction}
             title={state.dialogTitle}
             message={state.dialogMessage}
+          />
+          <ViewDetailDialog
+            isOpen={isOpen}
+            onClose={handleClose}
+            userInfo={selectedUser}
           />
         </div>
       }

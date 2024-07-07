@@ -78,55 +78,21 @@ export const updateUser = async (req, res, next) => {
   }
 };
 
-// export const getAllInfluencers = async (req, res, next) => {
-//   try {
-//     const page = parseInt(req.query.page) - 1 || 0;
-//     const limit = parseInt(req.query.limit) || 5;
-//     const search = req.query.search || "";
-//     let sort = req.query.sort || "username";
-//     let contents = req.query.contents || "All";
+// Get company by ID
+export const getCompanyById = async (req, res) => {
+  const { companyId } = req.params;
 
-//     const contentOptions = CONTENT;
+  try {
+    const company = await Company.findById(companyId).select({
+      password: 0,
+      licenceDocument: 0,
+    });
 
-//     contents === "All"
-//       ? (contents = [...contentOptions])
-//       : (contents = req.query.contents.split(","));
-//     req.query.sort ? (sort = req.query.sort.split(",")) : (sort = [sort]);
-
-//     let sortBy = {};
-//     if (sort[1]) {
-//       sortBy[sort[0]] = sort[1];
-//     } else {
-//       sortBy[sort[0]] = "asc";
-//     }
-
-//     const influencers = await Influencer.find({
-//       username: { $regex: search, $options: "i" },
-//     })
-//       .where("contents")
-//       .in([...contents])
-//       .sort(sortBy)
-//       .skip(page * limit)
-//       .limit(limit)
-//       .select("-password -email");
-
-//     const total = await Influencer.countDocuments({
-//       contents: { $in: [...contents] },
-//       username: { $regex: search, $options: "i" },
-//     });
-
-//     const response = {
-//       error: false,
-//       total,
-//       page: page + 1,
-//       limit,
-//       contents: contentOptions,
-//       influencers,
-//     };
-
-//     res.status(200).json(response);
-//   } catch (err) {
-//     console.error("Error fetching influencers:", err);
-//     next(errorHandler(500, "Internal Server Error"));
-//   }
-// };
+    if (!company) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+    res.status(200).json(company);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to retrieve company", error });
+  }
+};
