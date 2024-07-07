@@ -21,10 +21,11 @@ import PrivateRoute from "./components/PrivateRoute";
 import OAuth from "./components/AOuth";
 
 import ManageCollaborations from "./pages/ManageCollaborations";
+import UploadContent from "./pages/influencer/UploadContent";
 
 export default function App() {
   return (
-    <div className="max-w-screen-xl mx-auto">
+    <div className="w-full px-4 min-h-screen mx-auto">
       <BrowserRouter>
         <Routes>
           {/* Public Routes */}
@@ -75,6 +76,7 @@ export default function App() {
           {/* Routes accessible only to influencer */}
           <Route element={<PrivateRoute userTypeAllowed="influencer" />}>
             <Route path="/userprofile" element={<UserProfile />} />
+            <Route path="/upload-content" element={<UploadContent />} />
           </Route>
         </Routes>
       </BrowserRouter>

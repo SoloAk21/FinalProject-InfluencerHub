@@ -28,6 +28,8 @@ import DefaultPagination from "../../components/DefaultPagination";
 import MainStructure from "./MainStructure";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import ConfirmationDialog from "../../components/ConfirmationDialog";
+import { FaFileUpload } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const TABS = [
   { label: "All", value: "all" },
@@ -57,7 +59,7 @@ const ManageCampaign = () => {
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const [confirmationAction, setConfirmationAction] = useState("");
   const [confirmationCampaignId, setConfirmationCampaignId] = useState("");
-
+  const navigate = useNavigate();
   const openConfirmationDialog = (campaignId, action) => {
     setConfirmationOpen(true);
     setConfirmationAction(action);
@@ -127,6 +129,10 @@ const ManageCampaign = () => {
     } catch (error) {
       console.error("Error fetching campaign:", error);
     }
+  };
+
+  const handleContentSubmission = (campaignId) => {
+    navigate("/upload-content", { state: { campaignId } });
   };
 
   const handlePageChange = (page) => {
@@ -378,42 +384,75 @@ const ManageCampaign = () => {
                                 </Tooltip>
                                 {currentUser.userType === "influencer" && (
                                   <div className="flex gap-2">
-                                    <Tooltip content="Accept Campaign">
-                                      <IconButton
-                                        variant="text"
-                                        color="green"
-                                        onClick={() =>
-                                          openConfirmationDialog(_id, "accept")
-                                        }
-                                        disabled={status === "active"}
-                                      >
-                                        <div className="flex flex-col items-center gap-2 px-2">
-                                          <FcCheckmark className="h-3 w-3" />
-                                          <span className="text-[10px] text-green-600">
-                                            Accept
-                                          </span>
-                                        </div>
-                                      </IconButton>
-                                    </Tooltip>
-                                    <Tooltip content="Reject Campaign">
-                                      <IconButton
-                                        variant="text"
-                                        color="red"
-                                        onClick={() =>
-                                          openConfirmationDialog(_id, "reject")
-                                        }
-                                        disabled={status === "rejected"}
-                                      >
-                                        <div className="flex flex-col items-center gap-2 px-2">
-                                          <FcCancel className="h-3 w-3" />
-                                          <span className="text-[10px] text-red-600">
-                                            Reject
-                                          </span>
-                                        </div>
-                                      </IconButton>
-                                    </Tooltip>
+                                    {status !== "active" && (
+                                      <Tooltip content="Accept Campaign">
+                                        <IconButton
+                                          variant="text"
+                                          color="green"
+                                          onClick={() =>
+                                            openConfirmationDialog(
+                                              _id,
+                                              "accept"
+                                            )
+                                          }
+                                          disabled={status === "active"}
+                                        >
+                                          <div className="flex flex-col items-center gap-2 px-2">
+                                            <FcCheckmark className="h-3 w-3" />
+                                            <span className="text-[10px] text-green-600">
+                                              Accept
+                                            </span>
+                                          </div>
+                                        </IconButton>
+                                      </Tooltip>
+                                    )}
+                                    {status === "active" && (
+                                      <Tooltip content="Submit Content">
+                                        <IconButton
+                                          variant="text"
+                                          color="green"
+                                          onClick={() =>
+                                            handleContentSubmission(
+                                              _id,
+                                              "submit"
+                                            )
+                                          }
+                                        >
+                                          <div className="flex flex-col items-center gap-2 px-2">
+                                            <FaFileUpload className="h-3 w-3" />
+                                            <span className="text-[10px] text-green-600">
+                                              Submit
+                                            </span>
+                                          </div>
+                                        </IconButton>
+                                      </Tooltip>
+                                    )}
+                                    {status !== "rejected" &&
+                                      status !== "active" && (
+                                        <Tooltip content="Reject Campaign">
+                                          <IconButton
+                                            variant="text"
+                                            color="red"
+                                            onClick={() =>
+                                              openConfirmationDialog(
+                                                _id,
+                                                "reject"
+                                              )
+                                            }
+                                            disabled={status === "rejected"}
+                                          >
+                                            <div className="flex flex-col items-center gap-2 px-2">
+                                              <FcCancel className="h-3 w-3" />
+                                              <span className="text-[10px] text-red-600">
+                                                Reject
+                                              </span>
+                                            </div>
+                                          </IconButton>
+                                        </Tooltip>
+                                      )}
                                   </div>
                                 )}
+
                                 {currentUser.userType === "company" && (
                                   <Tooltip content="Delete Campaign">
                                     <IconButton variant="text">
