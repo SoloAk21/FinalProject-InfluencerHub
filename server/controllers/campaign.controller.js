@@ -32,9 +32,36 @@ export const getCampaignsByCompany = async (req, res) => {
     const totalPages = Math.ceil(totalCampaigns / pageSize);
 
     const campaigns = await Campaign.find({ company: companyId })
-      .populate("influencer")
+      .populate("influencer company")
       .skip((page - 1) * pageSize) // Skip previous pages
       .limit(pageSize); // Limit results per page
+
+    res.json({
+      campaigns: campaigns,
+      totalPages: totalPages,
+      currentPage: page,
+    });
+  } catch (error) {
+    console.error("Error fetching campaigns:", error);
+    res.status(500).json({ message: "Failed to fetch campaigns" });
+  }
+};
+
+export const getCampaignsByInfluencer = async (req, res) => {
+  try {
+    const { influencerId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
+
+    const totalCampaigns = await Campaign.countDocuments({
+      influencer: influencerId,
+    });
+    const totalPages = Math.ceil(totalCampaigns / pageSize);
+
+    const campaigns = await Campaign.find({ influencer: influencerId })
+      .populate("company influencer")
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
 
     res.json({
       campaigns: campaigns,
@@ -66,18 +93,23 @@ export const getCampaignById = async (req, res) => {
 // Update Campaign by ID
 export const updateCampaign = async (req, res) => {
   const { campaignId } = req.params;
+  const { status } = req.body;
+
   try {
     const updatedCampaign = await Campaign.findByIdAndUpdate(
       campaignId,
-      req.body,
+      { status },
       { new: true }
     );
+
     if (!updatedCampaign) {
-      return res.status(404).json({ message: "Campaign not found" });
+      return res.status(404).json({ error: "Campaign not found" });
     }
+
     res.json(updatedCampaign);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error updating campaign status:", error);
+    res.status(500).json({ error: "Failed to update campaign status" });
   }
 };
 

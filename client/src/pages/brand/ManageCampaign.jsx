@@ -20,11 +20,14 @@ import {
   MagnifyingGlassIcon,
   TrashIcon,
   PlusIcon,
+  BackwardIcon,
 } from "@heroicons/react/24/solid";
 import CampaignDetails from "./CampaignDetails";
-import { FcViewDetails } from "react-icons/fc";
+import { FcCancel, FcCheckmark, FcViewDetails } from "react-icons/fc";
 import DefaultPagination from "../../components/DefaultPagination";
 import MainStructure from "./MainStructure";
+import { IoIosArrowRoundBack } from "react-icons/io";
+import ConfirmationDialog from "../../components/ConfirmationDialog";
 
 const TABS = [
   { label: "All", value: "all" },
@@ -51,30 +54,67 @@ const ManageCampaign = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const [confirmationAction, setConfirmationAction] = useState("");
+  const [confirmationCampaignId, setConfirmationCampaignId] = useState("");
+
+  const openConfirmationDialog = (campaignId, action) => {
+    setConfirmationOpen(true);
+    setConfirmationAction(action);
+    setConfirmationCampaignId(campaignId);
+  };
+
+  const handleConfirmation = () => {
+    if (confirmationAction === "accept") {
+      updateCampaignStatus(confirmationCampaignId, "active");
+    } else if (confirmationAction === "reject") {
+      updateCampaignStatus(confirmationCampaignId, "rejected");
+    }
+    setConfirmationOpen(false);
+  };
+
+  const fetchCampaigns = async () => {
+    try {
+      let endpoint = "";
+      if (currentUser.userType === "company") {
+        const companyId = currentUser._id;
+        endpoint = `/api/campaigns/company/${companyId}`;
+      } else if (currentUser.userType === "influencer") {
+        const influencerId = currentUser._id;
+        endpoint = `/api/campaigns/influencer/${influencerId}`;
+      }
+
+      const response = await fetch(
+        `${endpoint}?page=${activePage}&pageSize=${PAGE_SIZE}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch campaigns");
+      }
+
+      const data = await response.json();
+
+      setCampaigns(data.campaigns);
+      setTotalPages(data.totalPages);
+      setCurrentPage(data.currentPage);
+    } catch (error) {
+      console.error("Error fetching campaigns:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchCampaignsByCompany = async () => {
-      try {
-        const companyId = currentUser._id;
-        const response = await fetch(
-          `/api/campaigns/company/${companyId}?page=${activePage}&pageSize=${PAGE_SIZE}`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch campaigns");
-        }
+    fetchCampaigns();
+  }, [currentUser._id, currentUser.userType, activePage]);
 
-        const data = await response.json();
-
-        setCampaigns(data.campaigns);
-        setTotalPages(data.totalPages); // Update totalPages from API response
-        setCurrentPage(data.currentPage); // Update currentPage from API response
-      } catch (error) {
-        console.error("Error fetching campaigns:", error);
-      }
-    };
-
-    fetchCampaignsByCompany();
-  }, [currentUser._id, activePage]);
+  useEffect(() => {
+    // This useEffect runs when campaigns or selectedCampaign changes
+    // You can add more dependencies as needed
+    console.log(
+      "Campaigns or Selected Campaign changed:",
+      campaigns,
+      selectedCampaign
+    );
+  }, [campaigns, selectedCampaign]);
 
   const fetchCampaignById = async (campaignId) => {
     try {
@@ -93,12 +133,54 @@ const ManageCampaign = () => {
     setActivePage(page);
   };
 
+  const updateCampaignStatus = async (campaignId, newStatus) => {
+    try {
+      const response = await fetch(`/api/campaigns/${campaignId}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update campaign status");
+      }
+
+      // Update the local state of campaigns after status update
+      const updatedCampaigns = campaigns.map((campaign) =>
+        campaign._id === campaignId
+          ? { ...campaign, status: newStatus }
+          : campaign
+      );
+      setCampaigns(updatedCampaigns);
+    } catch (error) {
+      console.error("Error updating campaign status:", error);
+    }
+  };
+
+  const handleBackToList = () => {
+    setSelectedCampaign(null);
+  };
+
   return (
     <MainStructure
       content={
         <div>
           {selectedCampaign ? (
-            <CampaignDetails campaign={selectedCampaign} />
+            <>
+              <div>
+                <IconButton
+                  variant="text"
+                  onClick={handleBackToList}
+                  className="hover:bg-gray-50"
+                >
+                  <IoIosArrowRoundBack className="h-8 w-8" />
+                </IconButton>
+              </div>
+              <hr className="my-0 border-gray-200" />
+              <CampaignDetails campaign={selectedCampaign} />
+            </>
           ) : (
             <Card className="h-full w-full">
               <CardHeader
@@ -169,6 +251,7 @@ const ManageCampaign = () => {
                         {
                           _id,
                           influencer,
+                          company,
                           campaignName,
                           status,
                           startDate,
@@ -185,7 +268,7 @@ const ManageCampaign = () => {
                           <tr key={_id}>
                             <td className={classes}>
                               <div className="flex items-center gap-3">
-                                {influencer && (
+                                {currentUser.userType === "company" ? (
                                   <>
                                     <Avatar
                                       src={
@@ -208,6 +291,32 @@ const ManageCampaign = () => {
                                         className="font-normal opacity-70"
                                       >
                                         {influencer.email || "No email"}
+                                      </Typography>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Avatar
+                                      src={
+                                        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+                                      }
+                                      alt={company.companyName || ""}
+                                      size="sm"
+                                    />
+                                    <div className="flex flex-col">
+                                      <Typography
+                                        variant="small"
+                                        color="blue-gray"
+                                        className="font-normal"
+                                      >
+                                        {company.companyName || "Unknown"}
+                                      </Typography>
+                                      <Typography
+                                        variant="small"
+                                        color="blue-gray"
+                                        className="font-normal opacity-70"
+                                      >
+                                        {company.email || "No email"}
                                       </Typography>
                                     </div>
                                   </>
@@ -234,7 +343,7 @@ const ManageCampaign = () => {
                                       ? "green"
                                       : status === "pending"
                                       ? "yellow"
-                                      : "blue-gray"
+                                      : "red"
                                   }
                                 />
                               </div>
@@ -258,19 +367,64 @@ const ManageCampaign = () => {
                               </Typography>
                             </td>
                             <td className={classes}>
-                              <Tooltip content="Delete Campaign">
-                                <IconButton variant="text">
-                                  <TrashIcon className="h-4 w-4" color="red" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip content="View Details">
-                                <IconButton
-                                  variant="text"
-                                  onClick={() => fetchCampaignById(_id)}
-                                >
-                                  <FcViewDetails className="h-4 w-4" />
-                                </IconButton>
-                              </Tooltip>
+                              <div className="flex gap-2">
+                                <Tooltip content="View Details">
+                                  <IconButton
+                                    variant="text"
+                                    onClick={() => fetchCampaignById(_id)}
+                                  >
+                                    <FcViewDetails className="h-4 w-4" />
+                                  </IconButton>
+                                </Tooltip>
+                                {currentUser.userType === "influencer" && (
+                                  <div className="flex gap-2">
+                                    <Tooltip content="Accept Campaign">
+                                      <IconButton
+                                        variant="text"
+                                        color="green"
+                                        onClick={() =>
+                                          openConfirmationDialog(_id, "accept")
+                                        }
+                                        disabled={status === "active"}
+                                      >
+                                        <div className="flex flex-col items-center gap-2 px-2">
+                                          <FcCheckmark className="h-3 w-3" />
+                                          <span className="text-[10px] text-green-600">
+                                            Accept
+                                          </span>
+                                        </div>
+                                      </IconButton>
+                                    </Tooltip>
+                                    <Tooltip content="Reject Campaign">
+                                      <IconButton
+                                        variant="text"
+                                        color="red"
+                                        onClick={() =>
+                                          openConfirmationDialog(_id, "reject")
+                                        }
+                                        disabled={status === "rejected"}
+                                      >
+                                        <div className="flex flex-col items-center gap-2 px-2">
+                                          <FcCancel className="h-3 w-3" />
+                                          <span className="text-[10px] text-red-600">
+                                            Reject
+                                          </span>
+                                        </div>
+                                      </IconButton>
+                                    </Tooltip>
+                                  </div>
+                                )}
+                                {currentUser.userType === "company" && (
+                                  <Tooltip content="Delete Campaign">
+                                    <IconButton variant="text">
+                                      <TrashIcon
+                                        className="h-4 w-4"
+                                        color="red"
+                                      />
+                                    </IconButton>
+                                  </Tooltip>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         );
@@ -295,6 +449,20 @@ const ManageCampaign = () => {
               </CardFooter>
             </Card>
           )}
+
+          <ConfirmationDialog
+            isOpen={confirmationOpen}
+            onClose={() => setConfirmationOpen(false)}
+            onConfirm={handleConfirmation}
+            title="Confirmation"
+            message={`Are you sure you want to ${
+              confirmationAction === "accept" ? "accept" : "reject"
+            } this campaign ${
+              confirmationAction === "accept"
+                ? "and start collaborating with the influencer?"
+                : "? This action cannot be undone. This campaign will be marked as rejected."
+            }`}
+          />
         </div>
       }
     />

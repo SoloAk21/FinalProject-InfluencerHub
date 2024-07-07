@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Input } from "@material-tailwind/react";
 import { FaSearch } from "react-icons/fa";
 import { useFetchConversations } from "../../hooks/useFetchConversations";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useSocketContext } from "../../context/SocketContext";
 
 export default function ChatList({ onSelectUser, selectedParticipant }) {
@@ -10,40 +10,74 @@ export default function ChatList({ onSelectUser, selectedParticipant }) {
   const { conversations, loading, error } = useFetchConversations();
   const [users, setUsers] = useState([]);
   const { onlineUsers } = useSocketContext();
+  const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
-    if (conversations.length > 0 && !selectedParticipant) {
-      // Select the latest chat (top chat) by default
-      const latestParticipantId =
-        conversations[0].participants[0].participant._id;
-      onSelectUser(latestParticipantId);
-    }
+    const fetchCollaborations = async () => {
+      try {
+        let endpoint = "/api/collaborations/list";
+        if (currentUser.userType === "influencer") {
+          endpoint += `?status=accepted`;
+        }
 
-    const newUsers = conversations.map((conversation) => {
-      const participant = conversation.participants[0].participant;
-      const lastMessage = conversation.lastMessage;
-      const userType = participant.userType;
+        const response = await fetch(endpoint);
+        if (!response.ok) {
+          throw new Error("Failed to fetch collaborations");
+        }
+        const data = await response.json();
+        const collaborations = data.collaborations;
 
-      let name =
-        userType === "company"
-          ? participant.companyName
-          : `${participant.firstName} ${participant.lastName}`;
+        console.log(conversations);
+        // Update users based on fetched collaborations
+        const newUsers = collaborations.map((collaboration) => {
+          const participant =
+            currentUser.userType === "influencer"
+              ? collaboration.fromUser
+              : collaboration.toUser;
 
-      return {
-        id: participant._id,
-        name: name,
-        message: lastMessage.content,
-        avatar: "default-avatar-url",
-        date: new Date(lastMessage.createdAt).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        isOnline: onlineUsers.includes(participant._id),
-      };
-    });
+          const lastMessage = collaboration.lastMessage;
+          const lastSeen = participant.lastSeen;
 
-    setUsers(newUsers);
-  }, [conversations, selectedParticipant, onSelectUser, onlineUsers]);
+          let name =
+            participant.userType === "company"
+              ? participant.companyName
+              : `${participant.firstName} ${participant.lastName}`;
+
+          return {
+            id: participant._id,
+            name: name,
+            message: lastMessage ? lastMessage.content : "", // Adjust according to your data structure
+            avatar: "default-avatar-url", // Replace with actual avatar URL if available
+            date: lastMessage
+              ? new Date(lastMessage.createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "",
+            lastSeen: lastSeen
+              ? new Date(lastSeen).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "",
+            isOnline: onlineUsers.includes(participant._id),
+          };
+        });
+
+        setUsers(newUsers);
+
+        // Select the latest chat (top chat) by default if no participant is selected
+        if (newUsers.length > 0 && !selectedParticipant) {
+          const latestParticipantId = newUsers[0].id;
+          onSelectUser(latestParticipantId);
+        }
+      } catch (error) {
+        console.error("Error fetching collaborations:", error);
+      }
+    };
+
+    fetchCollaborations();
+  }, [currentUser, selectedParticipant, onSelectUser, onlineUsers]);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -99,6 +133,11 @@ export default function ChatList({ onSelectUser, selectedParticipant }) {
                       <div className="inline-flex items-center text-xs font-thin text-gray-500 dark:text-white">
                         {user.isOnline ? "online" : user.date}
                       </div>
+                      {user.lastSeen && (
+                        <div className="inline-flex items-center text-xs font-thin text-gray-500 dark:text-white">
+                          Last seen: {user.lastSeen}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </li>

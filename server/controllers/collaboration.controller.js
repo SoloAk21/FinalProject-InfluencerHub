@@ -159,9 +159,17 @@ export const getCollaborations = async (req, res) => {
     let collaborations = [];
 
     if (userType === "influencer") {
-      collaborations = await Collaboration.find({ toUser: userId }).populate(
-        "fromUser toUser"
-      );
+      const { status } = req.query;
+      if (status === "accepted") {
+        collaborations = await Collaboration.find({
+          toUser: userId,
+          status: "accepted",
+        }).populate("fromUser toUser");
+      } else {
+        collaborations = await Collaboration.find({ toUser: userId }).populate(
+          "fromUser toUser"
+        );
+      }
     } else if (userType === "company") {
       collaborations = await Collaboration.find({ fromUser: userId }).populate(
         "fromUser toUser"
