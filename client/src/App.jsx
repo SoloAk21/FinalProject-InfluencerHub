@@ -21,7 +21,9 @@ import PrivateRoute from "./components/PrivateRoute";
 import OAuth from "./components/AOuth";
 
 import ManageCollaborations from "./pages/ManageCollaborations";
+
 import UploadContent from "./pages/influencer/UploadContent";
+import Content from "./pages/Content";
 
 export default function App() {
   return (
@@ -58,6 +60,7 @@ export default function App() {
             <Route path="/message" element={<Message />} />
             <Route path="/collaborations" element={<ManageCollaborations />} />
             <Route path="/manage-campaign" element={<ManageCampaign />} />
+            <Route path="/content" element={<Content />} />
           </Route>
 
           {/* Routes accessible only to company */}

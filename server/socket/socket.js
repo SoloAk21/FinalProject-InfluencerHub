@@ -26,6 +26,20 @@ io.on("connection", (socket) => {
 
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
+  socket.on("contentUpdate", async (updatedContent) => {
+    try {
+      const { _id, status } = updatedContent;
+      const updated = await Content.findByIdAndUpdate(
+        _id,
+        { status },
+        { new: true }
+      );
+
+      io.emit("contentUpdated", updated);
+    } catch (error) {
+      console.error("Error updating content:", error);
+    }
+  });
   socket.on("disconnect", () => {
     console.log("user disconnected", socket.id);
     delete userSocketMap[userId];

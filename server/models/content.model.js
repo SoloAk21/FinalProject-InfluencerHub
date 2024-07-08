@@ -7,6 +7,16 @@ const contentSchema = new Schema(
       ref: "Campaign",
       required: true,
     },
+    influencer: {
+      type: Schema.Types.ObjectId,
+      ref: "Influencer",
+      required: true,
+    },
+    company: {
+      type: Schema.Types.ObjectId,
+      ref: "Company",
+      required: true,
+    },
     contents: [
       {
         type: {
@@ -35,14 +45,22 @@ const contentSchema = new Schema(
 
 contentSchema.pre("save", function (next) {
   // Calculate overall status based on individual content statuses
-  const approvedContents = this.contents.filter(
-    (content) => content.status === "approved"
+  const rejectedContents = this.contents.some(
+    (content) => content.status === "rejected"
   );
 
-  if (approvedContents.length > 0) {
-    this.overallStatus = "approved";
+  if (rejectedContents) {
+    this.overallStatus = "rejected";
   } else {
-    this.overallStatus = "pending";
+    const approvedContents = this.contents.some(
+      (content) => content.status === "approved"
+    );
+
+    if (approvedContents) {
+      this.overallStatus = "approved";
+    } else {
+      this.overallStatus = "pending";
+    }
   }
 
   next();

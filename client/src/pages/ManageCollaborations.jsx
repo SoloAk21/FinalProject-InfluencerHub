@@ -173,6 +173,7 @@ const ManageCollaborations = () => {
     try {
       const response = await postToAuthAPI(apiPath, formData);
 
+      console.log(response);
       if (!response.ok) {
         throw new Error(`Failed to ${dialogAction} collaboration`);
       }
@@ -448,7 +449,6 @@ const ManageCollaborations = () => {
             isOpen={isOpen}
             onClose={handleClose}
             userInfo={selectedUser}
-            currentUserType={currentUser.userType}
           />
         </div>
       }

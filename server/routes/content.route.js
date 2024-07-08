@@ -1,27 +1,19 @@
 import express from "express";
+
 import { verifyToken } from "../utils/verifyUser.js";
 import {
-  createContent,
-  getContentById,
   updateContent,
-  deleteContent,
+  createContent,
   getContentByCampaign,
+  getContentByUserId,
 } from "../controllers/content.controller.js";
 
 const router = express.Router();
 
-// Create Content
 router.post("/create", verifyToken, createContent);
-// Get Content by ID
-router.get("/get:contentId", verifyToken, getContentById);
-
-// Get Content by Campaign ID
-router.get("/:campaignId", verifyToken, getContentByCampaign);
-
-// Update Content by ID
-router.put("/:contentId", verifyToken, updateContent);
-
-// Delete Content by ID
-router.delete("/:contentId", verifyToken, deleteContent);
+router.get("/content", verifyToken, getContentByUserId);
+router.get("/campaign/:campaignId", verifyToken, getContentByCampaign);
+// Update Campaign by ID
+router.put("/:contentId/status", verifyToken, updateContent);
 
 export default router;

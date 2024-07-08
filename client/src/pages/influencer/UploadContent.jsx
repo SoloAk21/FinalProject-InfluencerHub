@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { Card, Button, Textarea, Alert } from "@material-tailwind/react";
 import { v4 as uuidv4 } from "uuid";
 import { MdCancel } from "react-icons/md";
-import { FaFileImage, FaFileAudio, FaFileVideo } from "react-icons/fa";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../firebase";
 import { postToAuthAPI } from "../../helper/postToAuthAPI";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function UploadContent() {
   const [files, setFiles] = useState([]);
@@ -16,7 +16,8 @@ export default function UploadContent() {
   const [open, setOpen] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
-  const { campaignId } = location.state || {};
+  const { campaignId, companyId } = location.state || {};
+  const { currentUser } = useSelector((state) => state.user);
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -24,9 +25,10 @@ export default function UploadContent() {
       file: file,
       description: "",
       type: getFileType(file.type),
-      preview: file.type.startsWith("image/")
-        ? URL.createObjectURL(file)
-        : null,
+      preview:
+        file.type.startsWith("image/") || file.type.startsWith("video/")
+          ? URL.createObjectURL(file)
+          : null,
     }));
     setFiles([...files, ...newFiles]);
     setUploadError(null);
@@ -48,6 +50,12 @@ export default function UploadContent() {
   const handleDescriptionChange = (index, value) => {
     const updatedFiles = [...files];
     updatedFiles[index].description = value;
+    setFiles(updatedFiles);
+  };
+
+  const handleRemoveFile = (index) => {
+    const updatedFiles = [...files];
+    updatedFiles.splice(index, 1);
     setFiles(updatedFiles);
   };
 
@@ -83,12 +91,14 @@ export default function UploadContent() {
         ];
 
         const response = await postToAuthAPI("/api/contents/create", {
+          influencerId: currentUser._id,
+          companyId,
           campaignId,
           contents,
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to ${dialogAction} collaboration`);
+          throw new Error(`Failed to upload content`);
         }
 
         return fileURL;
@@ -181,20 +191,35 @@ export default function UploadContent() {
                 <Alert
                   className="rounded-none w-full bg-gray-400 font-medium"
                   open={open}
-                  onClose={() => setOpen(true)}
+                  onClose={() => handleRemoveFile(index)}
                 >
                   {file.file.name}
+                  <MdCancel
+                    className="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer"
+                    onClick={() => handleRemoveFile(index)}
+                  />
                 </Alert>
               </div>
+
               <div className="flex items-center mt-0 justify-between">
-                {file.preview && (
+                {file.preview && file.type === "image" && (
                   <img
                     src={file.preview}
                     alt="Preview"
-                    className="w-full h-auto "
+                    className="w-full h-auto"
                   />
                 )}
+                {file.preview && file.type === "video" && (
+                  <video
+                    className="w-full h-auto rounded-lg"
+                    controls
+                    src={file.preview}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                )}
               </div>
+
               <Textarea
                 placeholder="Description"
                 value={file.description}

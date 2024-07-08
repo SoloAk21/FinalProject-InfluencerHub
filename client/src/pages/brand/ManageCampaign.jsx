@@ -131,8 +131,8 @@ const ManageCampaign = () => {
     }
   };
 
-  const handleContentSubmission = (campaignId) => {
-    navigate("/upload-content", { state: { campaignId } });
+  const handleContentSubmission = (campaignId, companyId) => {
+    navigate("/upload-content", { state: { campaignId, companyId } });
   };
 
   const handlePageChange = (page) => {
@@ -414,7 +414,7 @@ const ManageCampaign = () => {
                                           onClick={() =>
                                             handleContentSubmission(
                                               _id,
-                                              "submit"
+                                              company._id
                                             )
                                           }
                                         >
