@@ -8,12 +8,14 @@ import {
   getPaymentById,
   updatePaymentStatus,
   verifyPayment,
+  webhook,
 } from "../controllers/payment.controller.js";
 
 const router = express.Router();
 
 router.post("/accept-payment", verifyToken, acceptPayment);
 router.get("/verify-payment/:tx_ref", verifyToken, verifyPayment);
+router.get("/webhook", verifyToken, webhook);
 
 router.post("/create", verifyToken, createPayment);
 router.get("/:paymentId", verifyToken, getPaymentById);

@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import Payment from "../models/payment.model.js";
 const CHAPA_AUTH_KEY = process.env.CHASECK_TEST;
-
+const CHAPA_SECRET_HASH = process.env.CHAPA_SECRET_HASH;
 // Create Campaign
 export const createPayment = async (req, res) => {
   try {
@@ -145,5 +145,62 @@ export const deletePayment = async (req, res) => {
     res.json({ message: "Payment deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+// Endpoint to handle webhooks
+export const webhook = async (req, res) => {
+  const chapaSignature = req.headers["chapa-signature"];
+  const hash = crypto
+    .createHmac("sha256", CHAPA_SECRET_HASH)
+    .update(JSON.stringify(req.body))
+    .digest("hex");
+
+  if (hash === chapaSignature) {
+    const event = req.body;
+    console.log("Webhook Event Received:", event);
+
+    // Handle different event types
+    switch (event.event) {
+      case "transaction.success":
+        // Update payment status in your database
+        try {
+          const paymentId = event.data.payment.id;
+          const updateData = {
+            status: "success",
+            updated_at: new Date(),
+            chapa_response: event.data,
+          };
+          await updatePaymentStatus(paymentId, updateData);
+          console.log(`Payment ${paymentId} updated successfully.`);
+        } catch (error) {
+          console.error("Error updating payment status:", error);
+        }
+        break;
+
+      case "transaction.failure":
+        // Handle failed transaction
+        try {
+          const paymentId = event.data.payment.id;
+          const updateData = {
+            status: "failed",
+            updated_at: new Date(),
+            chapa_response: event.data,
+          };
+          await updatePaymentStatus(paymentId, updateData);
+          console.log(`Payment ${paymentId} failed.`);
+        } catch (error) {
+          console.error("Error updating payment status:", error);
+        }
+        break;
+
+      default:
+        console.log(`Unhandled webhook event type: ${event.event}`);
+        break;
+    }
+
+    res.status(200).send("Webhook received");
+  } else {
+    res.status(400).send("Invalid signature");
   }
 };

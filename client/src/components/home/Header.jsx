@@ -196,8 +196,8 @@ export default function Header() {
   }, []);
 
   return (
-    <div className=" top-0 right-0 z-50 h-16">
-      <Navbar className="fixed top-0 z-50 mx-auto  px-4 py-2">
+    <div className="bg-red-400 top-0 right-0 left-0 z-50 h-16 flex-1 ">
+      <Navbar className="fixed rounded-none w- top-0 z-50 mx-auto  shadow-none border border-b-1 border-gray-500  px-4 py-2">
         <div className="flex items-center justify-between text-blue-gray-900">
           <Typography
             as="a"

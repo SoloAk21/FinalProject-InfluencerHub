@@ -24,10 +24,13 @@ import ManageCollaborations from "./pages/ManageCollaborations";
 
 import UploadContent from "./pages/influencer/UploadContent";
 import Content from "./pages/Content";
+import InitiateTransfer from "./pages/InitiateTransfer";
+import DisplayTransfers from "./pages/DisplayTransfer";
+import Home from "./pages/Home";
 
 export default function App() {
   return (
-    <div className="w-full px-4 min-h-screen mx-auto">
+    <div className="flex-col flex bg-white min-h-screen ">
       <BrowserRouter>
         <Routes>
           {/* Public Routes */}
@@ -55,6 +58,7 @@ export default function App() {
               path="/profile"
               element={<MainStructure content={<CompanyProfile />} />}
             />
+            <Route path="/" element={<Home />} />
             <Route path="/search" element={<Search />} />
             <Route path="/influencer/:id" element={<InfluencerDetail />} />
             <Route path="/message" element={<Message />} />
@@ -80,6 +84,8 @@ export default function App() {
           <Route element={<PrivateRoute userTypeAllowed="influencer" />}>
             <Route path="/userprofile" element={<UserProfile />} />
             <Route path="/upload-content" element={<UploadContent />} />
+            <Route path="/transfer" element={<InitiateTransfer />} />
+            <Route path="/display-transfer" element={<DisplayTransfers />} />
           </Route>
         </Routes>
       </BrowserRouter>

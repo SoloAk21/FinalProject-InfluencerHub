@@ -13,6 +13,7 @@ import paymentRouter from "./routes/payment.route.js";
 import campaignRouter from "./routes/campaign.route.js";
 import agreementRouter from "./routes/agreement.route.js";
 import contentRouter from "./routes/content.route.js";
+import transferRouter from "./routes/transfer.route.js";
 
 import cors from "cors";
 import { app, server } from "./socket/socket.js";
@@ -45,6 +46,7 @@ app.use("/api/payments", paymentRouter);
 app.use("/api/campaigns", campaignRouter);
 app.use("/api/agreements", agreementRouter);
 app.use("/api/contents", contentRouter);
+app.use("/api/transfers", transferRouter);
 
 // Error handling middleware
 app.use((error, req, res, next) => {
