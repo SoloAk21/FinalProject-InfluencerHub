@@ -1,3 +1,4 @@
+import Collaboration from "../models/collaboration.model.js";
 import Influencer from "../models/user/influencer.model.js";
 
 export const test = (req, res) => {
@@ -136,5 +137,41 @@ export const getInfluencerDetail = async (req, res) => {
       message: "Error fetching influencer details",
       error: error.message,
     });
+  }
+};
+
+export const searchUsers = async (req, res) => {
+  try {
+    const { query } = req.query;
+    const { userId } = req.user;
+
+    // Find all collaborations where company matches userId and status is "accepted"
+    const collaborations = await Collaboration.find({
+      company: userId, // Match userId in the company field
+      status: "accepted", // Only fetch collaborations with status "accepted"
+    }).populate({
+      path: "influencer", // Populate the 'influencer' field with influencer data
+      match: {
+        $or: [
+          { username: { $regex: query, $options: "i" } },
+          { email: { $regex: query, $options: "i" } },
+          { firstName: { $regex: query, $options: "i" } },
+          { lastName: { $regex: query, $options: "i" } },
+        ],
+      },
+    });
+
+    const influencers = collaborations
+      .map((collaboration) => collaboration.influencer)
+      .filter((influencer) => influencer !== null);
+
+    // Check if influencers array is not empty
+    if (influencers.length > 0) {
+      res.json(influencers);
+    } else {
+      res.json([]); // Return an empty array if no influencers are found
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

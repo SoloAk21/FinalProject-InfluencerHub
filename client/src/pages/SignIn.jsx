@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Typography, Input, Button, useSelect } from "@material-tailwind/react";
 import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/solid";
-import Header from "../components/Header";
+
 import { useNavigate, Link } from "react-router-dom";
 import { postToAuthAPI } from "../helper/postToAuthAPI";
 import OAuth from "../components/AOuth"; // Assuming correct import

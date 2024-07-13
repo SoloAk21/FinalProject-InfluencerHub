@@ -33,7 +33,7 @@ export default function ChatList({ onSelectUser, selectedParticipant }) {
           const participant =
             currentUser.userType === "influencer"
               ? collaboration.fromUser
-              : collaboration.toUser;
+              : collaboration.influencer;
 
           const lastMessage = collaboration.lastMessage;
           const lastSeen = participant.lastSeen;

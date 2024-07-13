@@ -6,8 +6,8 @@ export const sendCollaborationRequest = async (req, res) => {
     const company = req.user; // Assuming the company is authenticated and its ID is available
 
     const newCollaboration = new Collaboration({
-      fromUser: company.userId,
-      toUser: influencerId,
+      company: company.userId,
+      influencer: influencerId,
     });
 
     await newCollaboration.save();
@@ -23,8 +23,8 @@ export const checkCollabStatus = async (req, res) => {
     const company = req.user; // Assuming the company is authenticated and its ID is available
 
     const collaboration = await Collaboration.findOne({
-      fromUser: company.userId,
-      toUser: influencerId,
+      company: company.userId,
+      influencer: influencerId,
     });
 
     if (collaboration) {
@@ -52,7 +52,7 @@ export const respondToCollaborationRequest = async (req, res) => {
     }
 
     if (status === "request-back") {
-      if (collaboration.fromUser.toString() !== userId.toString()) {
+      if (collaboration.company.toString() !== userId.toString()) {
         return res.status(403).json({
           error:
             "You do not have permission to request back this collaboration",
@@ -64,7 +64,7 @@ export const respondToCollaborationRequest = async (req, res) => {
         .json({ message: "Collaboration deleted successfully" });
     }
 
-    if (collaboration.toUser.toString() !== userId.toString()) {
+    if (collaboration.influencer.toString() !== userId.toString()) {
       return res
         .status(403)
         .json({ error: "You do not have permission to perform this action" });
@@ -85,8 +85,8 @@ export const findCollabIdBetweenUsers = async (req, res) => {
   try {
     const collaboration = await Collaboration.findOne({
       $or: [
-        { fromUser: userId1, toUser: userId2 },
-        { fromUser: userId2, toUser: userId1 },
+        { company: userId1, influencer: userId2 },
+        { company: userId2, influencer: userId1 },
       ],
     });
 
@@ -118,22 +118,22 @@ export const getCollaborationsByUserType = async (req, res) => {
 
     if (userType === "influencer") {
       totalCollaborations = await Collaboration.countDocuments({
-        toUser: userId,
+        influencer: userId,
       });
       totalPages = Math.ceil(totalCollaborations / pageSize);
 
-      collaborations = await Collaboration.find({ toUser: userId })
-        .populate("fromUser toUser")
+      collaborations = await Collaboration.find({ influencer: userId })
+        .populate("company influencer")
         .skip((page - 1) * pageSize)
         .limit(pageSize);
     } else if (userType === "company") {
       totalCollaborations = await Collaboration.countDocuments({
-        fromUser: userId,
+        company: userId,
       });
       totalPages = Math.ceil(totalCollaborations / pageSize);
 
-      collaborations = await Collaboration.find({ fromUser: userId })
-        .populate("fromUser toUser")
+      collaborations = await Collaboration.find({ company: userId })
+        .populate("company influencer")
         .skip((page - 1) * pageSize)
         .limit(pageSize);
     } else {
@@ -162,17 +162,17 @@ export const getCollaborations = async (req, res) => {
       const { status } = req.query;
       if (status === "accepted") {
         collaborations = await Collaboration.find({
-          toUser: userId,
+          influencer: userId,
           status: "accepted",
-        }).populate("fromUser toUser");
+        }).populate("company influencer");
       } else {
-        collaborations = await Collaboration.find({ toUser: userId }).populate(
-          "fromUser toUser"
-        );
+        collaborations = await Collaboration.find({
+          influencer: userId,
+        }).populate("company influencer");
       }
     } else if (userType === "company") {
-      collaborations = await Collaboration.find({ fromUser: userId }).populate(
-        "fromUser toUser"
+      collaborations = await Collaboration.find({ company: userId }).populate(
+        "company influencer"
       );
     } else {
       return res.status(400).json({ message: "Invalid user type" });

@@ -265,7 +265,7 @@ const ManageCollaborations = () => {
 
                       <tbody>
                         {state.collaborations.map(
-                          ({ _id, status, createdAt, fromUser, toUser }) => {
+                          ({ _id, status, createdAt, company, influencer }) => {
                             const isLast =
                               state.collaborations.indexOf(_id) ===
                               state.collaborations.length - 1;
@@ -275,16 +275,16 @@ const ManageCollaborations = () => {
 
                             const name =
                               currentUser.userType === "influencer"
-                                ? fromUser.companyName
-                                : `${toUser.firstName} ${toUser.lastName} `;
+                                ? company.companyName
+                                : `${influencer.firstName} ${influencer.lastName} `;
 
                             const selectedUser =
                               currentUser.userType === "influencer"
-                                ? fromUser
-                                : toUser;
+                                ? company
+                                : influencer;
                             currentUser.userType === "influencer"
-                              ? fromUser.companyName
-                              : `${toUser.firstName} ${toUser.lastName} `;
+                              ? company.companyName
+                              : `${influencer.firstName} ${influencer.lastName} `;
 
                             const userProfile =
                               "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
@@ -315,7 +315,7 @@ const ManageCollaborations = () => {
                                         className="font-normal opacity-70"
                                       >
                                         {currentUser.userType === "influencer"
-                                          ? fromUser.email
+                                          ? company.email
                                           : toUser.email}
                                       </Typography>
                                     </div>

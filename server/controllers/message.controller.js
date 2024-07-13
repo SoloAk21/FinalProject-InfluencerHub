@@ -36,10 +36,10 @@ export const sendMessage = async (req, res) => {
         .json({ message: "Collaboration not accepted or does not exist" });
     }
     if (
-      (collab.fromUser.toString() !== sender ||
-        collab.toUser.toString() !== recipient) &&
-      (collab.fromUser.toString() !== recipient ||
-        collab.toUser.toString() !== sender)
+      (collab.company.toString() !== sender ||
+        collab.influencer.toString() !== recipient) &&
+      (collab.company.toString() !== recipient ||
+        collab.influencer.toString() !== sender)
     ) {
       return res.status(403).json({ message: "Invalid collaboration users" });
     }

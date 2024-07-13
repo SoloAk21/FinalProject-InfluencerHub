@@ -3,8 +3,12 @@ import { COLLABORATION_STATUS } from "../enum.js";
 
 const collaborationSchema = new Schema(
   {
-    fromUser: { type: Schema.Types.ObjectId, ref: "Company", required: true },
-    toUser: { type: Schema.Types.ObjectId, ref: "Influencer", required: true },
+    company: { type: Schema.Types.ObjectId, ref: "Company", required: true },
+    influencer: {
+      type: Schema.Types.ObjectId,
+      ref: "Influencer",
+      required: true,
+    },
     status: {
       type: String,
       enum: COLLABORATION_STATUS,

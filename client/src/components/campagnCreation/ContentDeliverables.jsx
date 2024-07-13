@@ -1,18 +1,47 @@
 import React from "react";
-import {
-  Typography,
-  List,
-  ListItem,
-  ListItemPrefix,
-  Checkbox,
-} from "@material-tailwind/react";
 
 const ContentDeliverables = ({ campaignInfo, setCampaignInfo }) => {
   const contentDeliverablesOptions = [
-    { value: "socialMediaPost", label: "Social Media Post" },
-    { value: "blogPost", label: "Blog Post" },
-    { value: "videoContent", label: "Video Content" },
-    { value: "podcastEpisode", label: "Podcast Episode" },
+    {
+      value: "socialMediaPost",
+      label: "Social Media Post",
+      description:
+        "Short, engaging content for platforms like Instagram, Facebook, Twitter, etc.",
+    },
+    {
+      value: "blogPost",
+      label: "Blog Post",
+      description:
+        "Detailed articles with in-depth information, usually longer than social media posts.",
+    },
+    {
+      value: "article",
+      label: "Article",
+      description: "Can be published on websites, blogs, or magazines.",
+    },
+    {
+      value: "productReview",
+      label: "Product Review",
+      description: "Detailed reviews of products or services.",
+    },
+    {
+      value: "howToGuide",
+      label: "How-To Guide",
+      description:
+        "Step-by-step instructions on how to use a product or perform a task.",
+    },
+    {
+      value: "interview",
+      label: "Interview",
+      description: "Conversations with experts or brand representatives.",
+    },
+
+    {
+      value: "other",
+      label: "Other",
+      description:
+        "Custom content deliverables not listed above. Please specify in the details field.",
+    },
   ];
 
   const handleContentDeliverablesChange = (value, checked) => {
@@ -32,51 +61,71 @@ const ContentDeliverables = ({ campaignInfo, setCampaignInfo }) => {
   };
 
   return (
-    <div className="my-1">
-      <Typography variant="body">Content Deliverables</Typography>
+    <div className="mx-auto py-12 flex flex-col ">
+      <div className="mb-2">
+        <h2 className="text-lg font-medium text-gray-800">
+          Content Deliverables
+        </h2>
+        <p className="text-sm text-gray-500">
+          Select the types of content deliverables expected from influencers.
+        </p>
+      </div>
       {contentDeliverablesOptions.map((option) => (
-        <label key={option.value} className="flex items-center m-0">
-          <List className="w-full">
-            <ListItem className="p-0">
-              <label
-                htmlFor={option.value}
-                className="flex w-full cursor-pointer items-center px-3"
+        <div key={option.value} className="py-3 ml-20 w-full flex">
+          <div className="bg-white dark:bg-gray-800 border rounded-sm border-gray-400 dark:border-gray-700 w-5 h-5 flex flex-shrink-0 relative">
+            <input
+              type="checkbox"
+              id={option.value}
+              checked={campaignInfo.contentDeliverables.includes(option.value)}
+              onChange={(e) =>
+                handleContentDeliverablesChange(option.value, e.target.checked)
+              }
+              className="checkbox opacity-0 absolute cursor-pointer w-full h-full"
+            />
+            <div
+              className={`check-icon ${
+                campaignInfo.contentDeliverables.includes(option.value)
+                  ? "block"
+                  : "hidden"
+              } bg-indigo-700 text-white rounded-sm`}
+            >
+              <svg
+                className="icon icon-tabler icon-tabler-check"
+                xmlns="http://www.w3.org/2000/svg"
+                width={20}
+                height={20}
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                <ListItemPrefix className="mr-3">
-                  <Checkbox
-                    id={option.value}
-                    value={option.value}
-                    checked={campaignInfo.contentDeliverables.includes(
-                      option.value
-                    )}
-                    onChange={(e) =>
-                      handleContentDeliverablesChange(
-                        option.value,
-                        e.target.checked
-                      )
-                    }
-                    ripple={false}
-                    className="hover:before:opacity-0"
-                    containerProps={{ className: "p-0" }}
-                  />
-                </ListItemPrefix>
-                <Typography color="blue-gray" className="font-medium">
-                  {option.label}
-                </Typography>
-              </label>
-            </ListItem>
-          </List>
-        </label>
+                <path stroke="none" d="M0 0h24v24H0z" />
+                <path d="M5 12l5 5l10 -10" />
+              </svg>
+            </div>
+          </div>
+          <p className=" text-base leading-4 font-normal text-gray-800 dark:text-gray-100">
+            <div className="pl-2">
+              <p className="text-sm font-medium leading-none text-gray-800">
+                {option.label}
+              </p>
+              <p className="text-xs leading-3 text-gray-600 mt-1">
+                {option.description}
+              </p>
+            </div>
+          </p>
+        </div>
       ))}
-
-      <Typography
-        variant="small"
-        color="gray"
-        className="text-xs font-normal m-1 mx-2"
-      >
-        Select the types of content deliverables expected from influencers. For
-        example, "Social Media Post".
-      </Typography>
+      <style jsx>{`
+        .checkbox:checked {
+          border: none;
+        }
+        .checkbox:checked + .check-icon {
+          display: flex;
+        }
+      `}</style>
     </div>
   );
 };
