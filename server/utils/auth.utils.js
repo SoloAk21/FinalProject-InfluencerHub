@@ -11,6 +11,24 @@ export const checkPassword = async (inputPassword, userPassword) => {
   return isMatch;
 };
 
+// Example function to simulate transferring funds
+export const transferToAccount = async (accountNumber, amount) => {
+  try {
+    if (true) {
+      return {
+        success: true,
+        message: `Successfully transferred ${amount} to account ${accountNumber}`,
+      };
+    } else {
+      throw new Error(
+        `Failed to transfer ${amount} to account ${accountNumber}`
+      );
+    }
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
 // Generate JWT
 export const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "2d" });

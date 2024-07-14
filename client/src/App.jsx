@@ -27,6 +27,7 @@ import Content from "./pages/Content";
 import InitiateTransfer from "./pages/InitiateTransfer";
 import DisplayTransfers from "./pages/DisplayTransfer";
 import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
 
 export default function App() {
   return (
@@ -65,6 +66,7 @@ export default function App() {
             <Route path="/collaborations" element={<ManageCollaborations />} />
             <Route path="/manage-campaign" element={<ManageCampaign />} />
             <Route path="/content" element={<Content />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Route>
 
           {/* Routes accessible only to company */}

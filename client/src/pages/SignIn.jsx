@@ -61,7 +61,6 @@ export default function SignIn() {
 
   return (
     <>
-      <Header />
       <section className="flex items-center justify-center p-6">
         <div className="w-full max-w-xs">
           <Typography

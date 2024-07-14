@@ -5,7 +5,10 @@ import {
   acceptPayment,
   createPayment,
   deletePayment,
+  // earnMoney,
   getPaymentById,
+  getPaymentData,
+  processPendingPayments,
   updatePaymentStatus,
   verifyPayment,
   webhook,
@@ -16,9 +19,10 @@ const router = express.Router();
 router.post("/accept-payment", verifyToken, acceptPayment);
 router.get("/verify-payment/:tx_ref", verifyToken, verifyPayment);
 router.get("/webhook", verifyToken, webhook);
+router.get("/list", verifyToken, getPaymentData);
 
 router.post("/create", verifyToken, createPayment);
-router.get("/:paymentId", verifyToken, getPaymentById);
+router.post("/transfer", verifyToken, processPendingPayments);
 
 // Update Payment Status by ID
 router.put("/:paymentId", verifyToken, updatePaymentStatus);

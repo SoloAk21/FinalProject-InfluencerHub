@@ -10,11 +10,13 @@ const paymentSchema = new Schema(
     amount: { type: Number, required: true },
     paymentDate: { type: Date, default: Date.now },
     transactionId: { type: String },
+
     status: {
       type: String,
-      enum: ["Pending", "Completed", "Failed"],
+      enum: ["Pending", "Processing", "Completed", "Failed", "Refunded"],
       default: "Pending",
     },
+    paymentType: { type: String, enum: ["Stripe"], default: "Stripe" },
   },
   {
     timestamps: true,
