@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import MainStructure from "./MainStructure";
 import ContentDeliverables from "../../components/campagnCreation/ContentDeliverables";
 import AgreementDialog from "../../components/campagnCreation/AgreementDialog";
-import axios from "axios";
 import { setSelectedParticipant } from "../../redux/chat/chatSlice";
 import { useDispatch } from "react-redux";
 

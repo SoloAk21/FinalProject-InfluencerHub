@@ -1,5 +1,3 @@
-// context/SocketContext.js
-
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useSelector } from "react-redux";
 import io from "socket.io-client";
@@ -29,6 +27,7 @@ export const SocketContextProvider = ({ children }) => {
         setOnlineUsers(users);
       });
 
+      socketInstance.on();
       return () => socketInstance.close();
     } else {
       if (socket) {

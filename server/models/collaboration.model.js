@@ -14,6 +14,14 @@ const collaborationSchema = new Schema(
       enum: COLLABORATION_STATUS,
       default: "pending",
     },
+    lastMessage: {
+      type: String,
+      default: null,
+    },
+    lastSeen: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

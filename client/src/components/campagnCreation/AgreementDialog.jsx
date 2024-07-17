@@ -94,7 +94,7 @@ const AgreementDialog = ({ isOpen, onClose, campaignInfo }) => {
         {" "}
         <div className="">
           <p className="text-gray-800 dark:text-white lg:text-4xl text-3xl font-extrabold leading-9">
-            Trello x Webber
+            Campaign agreement
           </p>
         </div>
       </DialogHeader>

@@ -16,7 +16,7 @@ import contentRouter from "./routes/content.route.js";
 import transferRouter from "./routes/transfer.route.js";
 
 import cors from "cors";
-import { app, server } from "./socket/socket.js";
+import { app, io, server } from "./socket/socket.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -58,6 +58,7 @@ app.use((error, req, res, next) => {
   });
 });
 
+app.set("io", io);
 // Start the server
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

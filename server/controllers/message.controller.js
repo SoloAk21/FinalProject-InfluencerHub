@@ -1,132 +1,109 @@
-import Conversation from "../models/conversation.model.js";
+import asyncHandler from "express-async-handler";
+import { userSocketMap } from "../socket/socket.js";
 import Message from "../models/message.model.js";
-
-import Influencer from "../models/user/influencer.model.js";
-import Company from "../models/user/company.model.js";
 import Collaboration from "../models/collaboration.model.js";
-import { getReceiverSocketId, io } from "../socket/socket.js";
 
-const getUserModel = async (userId) => {
-  const influencer = await Influencer.findById(userId);
-  if (influencer) {
-    return "Influencer";
-  }
-  const company = await Company.findById(userId);
-  if (company) {
-    return "Company";
-  }
-  throw new Error("User not found");
+// Helper function to get receiver's socket ID
+const getReceiverSocketId = (receiverId) => {
+  return userSocketMap[receiverId];
 };
 
-export const sendMessage = async (req, res) => {
-  try {
-    const user = req.user;
-    const { collaboration, sender, recipient, content } = req.body;
+// Send a message
+export const sendMessage = asyncHandler(async (req, res) => {
+  const { receiverId, content } = req.body;
+  const senderId = req.user.userId;
 
-    // Check if the sender matches the authenticated user
-    if (user.userId !== sender) {
-      return res.status(403).json({ message: "Unauthorized action" });
-    }
+  const newMessage = new Message({
+    sender: senderId,
+    receiver: receiverId,
+    onModel: req.user.userType === "Company" ? "Influencer" : "Company",
+    content,
+  });
 
-    // Check if the collaboration request is accepted and the users match
-    const collab = await Collaboration.findById(collaboration);
-    if (!collab || collab.status !== "accepted") {
-      return res
-        .status(403)
-        .json({ message: "Collaboration not accepted or does not exist" });
-    }
-    if (
-      (collab.company.toString() !== sender ||
-        collab.influencer.toString() !== recipient) &&
-      (collab.company.toString() !== recipient ||
-        collab.influencer.toString() !== sender)
-    ) {
-      return res.status(403).json({ message: "Invalid collaboration users" });
-    }
+  const message = await newMessage.save();
 
-    // Determine sender and recipient models based on sender and recipient IDs
-    const senderModel = await getUserModel(sender);
-    const recipientModel = await getUserModel(recipient);
+  // Update lastMessage and lastSeen in Collaboration
+  const collaborationFilter = {
+    company: req.user.model === "Company" ? req.user.userId : receiverId,
+    influencer: req.user.model === "Influencer" ? req.user.userId : receiverId,
+  };
 
-    // Create a new message
-    const message = new Message({
-      sender,
-      recipient,
-      onModel: senderModel,
-      content,
-    });
+  const collaborationUpdate = {
+    lastMessage: content,
+    lastSeen: new Date(), // Update lastSeen to current time
+  };
 
-    // Save the message
-    await message.save();
+  const collaboration = await Collaboration.findOneAndUpdate(
+    collaborationFilter,
+    collaborationUpdate,
+    { new: true }
+  );
 
-    let conversation = await Conversation.findOne({
-      participants: {
-        $all: [
-          { $elemMatch: { participant: sender, model: senderModel } },
-          { $elemMatch: { participant: recipient, model: recipientModel } },
-        ],
-      },
-    });
-
-    if (conversation) {
-      // Update existing conversation with the new message
-      conversation.messages.push(message._id);
-      conversation.lastMessage = message._id;
-    } else {
-      // Create a new conversation
-      conversation = new Conversation({
-        participants: [
-          { participant: sender, model: senderModel },
-          { participant: recipient, model: recipientModel },
-        ],
-        messages: [message._id],
-        lastMessage: message._id,
-      });
-    }
-    await conversation.save();
-    res
-      .status(201)
-      .json({ message: "Message sent successfully", data: message });
-
-    // SOCKET IO FUNCTIONALITY
-    const receiverSocketId = getReceiverSocketId(recipient);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("newMessage", message);
-    }
-  } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .json({ message: "Error sending message", error: error.message });
+  if (!collaboration) {
+    console.log("Collaboration not found for filter:", collaborationFilter);
+    return res.status(404).json({ error: "Collaboration not found" });
   }
-};
 
-export const receiveMessage = async (req, res) => {
-  try {
-    const { messageId } = req.params;
-    const user = req.user;
+  console.log(collaboration);
+  // Emit the message to the recipient via Socket.io
+  const io = req.app.get("io");
+  const receiverSocketId = getReceiverSocketId(receiverId);
 
-    const message = await Message.findById(messageId);
-    if (!message) {
-      return res.status(404).json({ message: "Message not found" });
-    }
-
-    if (message.recipient.toString() !== user.userId) {
-      return res.status(403).json({ message: "Unauthorized action" });
-    }
-
-    message.read = true;
-    await message.save();
-    // SOCKET IO FUNCTIONALITY
-    const receiverSocketId = getReceiverSocketId(recipient);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("newMessage", message);
-    }
-    res.status(200).json({ message: "Message received", data: message });
-  } catch (error) {
-    console.error("Error receiving message:", error);
-    res
-      .status(500)
-      .json({ message: "Error receiving message", error: error.message });
+  if (receiverSocketId) {
+    io.to(receiverSocketId).emit("send_message", message); // Emit the saved message object
   }
-};
+
+  res.status(200).json(message);
+});
+
+// Mark a message as received (read)
+export const receiveMessage = asyncHandler(async (req, res) => {
+  const { messageId } = req.params;
+
+  const message = await Message.findById(messageId);
+
+  if (!message) {
+    res.status(404);
+    throw new Error("Message not found");
+  }
+
+  message.read = true; // Mark message as read if required
+  await message.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Message marked as read",
+    data: message,
+  });
+});
+
+export const getMessage = asyncHandler(async (req, res) => {
+  const { userId } = req.user;
+  const { participantId } = req.params;
+
+  const messages = await Message.find({
+    $or: [
+      { sender: userId, receiver: participantId },
+      { sender: participantId, receiver: userId },
+    ],
+  }).sort({ createdAt: 1 });
+
+  res.status(200).json({ success: true, messages });
+});
+
+// Mark messages as read
+export const markAsRead = asyncHandler(async (req, res) => {
+  console.log("jsjdg");
+  const { messageId } = req.params;
+
+  const message = await Message.findById(messageId);
+
+  if (!message) {
+    return res.status(404).json({ error: "Message not found" });
+  }
+
+  message.read = true;
+  await message.save();
+
+  res.status(200).json({ success: true, message });
+});

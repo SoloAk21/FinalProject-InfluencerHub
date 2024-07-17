@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 const messageSchema = new Schema(
   {
     sender: { type: Schema.Types.ObjectId, required: true, refPath: "onModel" },
-    recipient: {
+    receiver: {
       type: Schema.Types.ObjectId,
       required: true,
       refPath: "onModel",

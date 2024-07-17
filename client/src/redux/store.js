@@ -8,7 +8,6 @@ import chatReducer from "./chat/chatSlice.js";
 const rootReducer = combineReducers({
   user: userReducer,
   email: emailReducer,
-  chat: chatReducer,
 });
 
 const persistConfig = {
