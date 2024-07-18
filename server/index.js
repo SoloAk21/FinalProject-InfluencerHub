@@ -15,6 +15,7 @@ import agreementRouter from "./routes/agreement.route.js";
 import contentRouter from "./routes/content.route.js";
 import transferRouter from "./routes/transfer.route.js";
 
+import resetPasswordRouter from "./routes/resetpassword.route.js";
 import cors from "cors";
 import { app, io, server } from "./socket/socket.js";
 
@@ -47,7 +48,7 @@ app.use("/api/campaigns", campaignRouter);
 app.use("/api/agreements", agreementRouter);
 app.use("/api/contents", contentRouter);
 app.use("/api/transfers", transferRouter);
-
+app.use("/api/forgot-password", resetPasswordRouter);
 // Error handling middleware
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;

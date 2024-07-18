@@ -4,6 +4,7 @@ import Company from "../models/user/company.model.js";
 import {
   checkUniqueness,
   googleAuth,
+  // googleAuth,
   signIn,
   signUp,
 } from "../controllers/auth.controller.js";
@@ -16,7 +17,7 @@ router.post(
   checkUniqueness(Influencer, ["username", "email"])
 );
 router.post("/influencers/signup", signUp(Influencer, "Influencer"));
-router.post("/influencers/google", googleAuth(Influencer, "Influencer"));
+// router.post("/influencers/google", googleAuth(Influencer, "Influencer"));
 
 // Company routes
 router.post(
@@ -24,7 +25,9 @@ router.post(
   checkUniqueness(Company, ["companyName", "email"])
 );
 router.post("/companies/signup", signUp(Company, "Company"));
-router.post("/companies/google", googleAuth(Company, "Company"));
+// router.post("/companies/google", googleAuth(Company, "Company"));
+
+router.post("/googleAuth", googleAuth);
 
 router.post("/signin", signIn);
 

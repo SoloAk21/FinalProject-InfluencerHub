@@ -19,7 +19,7 @@ import ManageCampaign from "./pages/brand/ManageCampaign";
 import CampaignDetails from "./pages/brand/CampaignDetails";
 import PrivateRoute from "./components/PrivateRoute";
 import OAuth from "./components/AOuth";
-
+import ForgotPassword from "./pages/ForgotPassword";
 import ManageCollaborations from "./pages/ManageCollaborations";
 
 import UploadContent from "./pages/influencer/UploadContent";
@@ -28,6 +28,7 @@ import InitiateTransfer from "./pages/InitiateTransfer";
 import DisplayTransfers from "./pages/DisplayTransfer";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
+import ResetPassword from "./pages/ResetPassword";
 
 export default function App() {
   return (
@@ -67,6 +68,11 @@ export default function App() {
             <Route path="/manage-campaign" element={<ManageCampaign />} />
             <Route path="/content" element={<Content />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route
+              path="/reset-password/:id/:userType/:token"
+              element={<ResetPassword />}
+            />
           </Route>
 
           {/* Routes accessible only to company */}

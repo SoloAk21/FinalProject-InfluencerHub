@@ -77,27 +77,30 @@ export const signUp = (Model, userTypeName) => async (req, res, next) => {
   }
 };
 
-// Handle Google sign-in/up
-export const googleAuth = (Model, userTypeName) => async (req, res, next) => {
+export const googleAuth = async (req, res, next) => {
+  const { email } = req.body;
+  console.log("Received email:", email);
+
   try {
-    const { email } = req.body;
-    const user = await Model.findOne({ email });
+    let user = await Company.findOne({ email });
 
     if (!user) {
-      return res
-        .status(201)
-        .json({ userExists: false, message: "Continue signup..." });
+      user = await Influencer.findOne({ email });
+      if (!user) {
+        return next(errorHandler(401, "No records found."));
+      }
+    }
+
+    if (user.active === false) {
+      return next(errorHandler(401, "Your account is not active."));
     }
 
     const token = generateToken(user._id);
     res.cookie("access_token", token, { httpOnly: true });
-    res.status(200).json({
-      success: true,
-      message: "Authentication successful",
-      id: user._id,
-    });
+    const { password: _, ...userData } = user._doc;
+    res.status(200).json(userData);
   } catch (error) {
-    next(error.message);
+    next(error);
   }
 };
 
@@ -118,10 +121,15 @@ export const signIn = async (req, res, next) => {
       );
     }
 
+    if (user.active === false) {
+      return next(errorHandler(401, "Your account is not active."));
+    }
+
     const isMatch = await checkPassword(password, user.password);
 
     console.log(isMatch);
     if (!isMatch) {
+      console.log("User not found with email:", email);
       return next(
         errorHandler(401, "Email or password or user type incorrect")
       );

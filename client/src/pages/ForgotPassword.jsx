@@ -1,32 +1,23 @@
 import React, { useState } from "react";
 import { Typography, Input, Button, useSelect } from "@material-tailwind/react";
 import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/solid";
-
 import { useNavigate, Link } from "react-router-dom";
 import { postToAuthAPI } from "../helper/postToAuthAPI";
 import OAuth from "../components/AOuth"; // Assuming correct import
 import { useDispatch, useSelector } from "react-redux";
 import { signInSuccess } from "../redux/user/userSlice";
-
+import { auth } from "../firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import axios from "axios";
-import Header from "../components/home/Header";
 
 export default function SignIn() {
-  const [passwordShown, setPasswordShown] = useState(false);
-  const { currentUser } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({
     email: "",
-    password: "",
     userType: "",
   });
-  const dispatch = useDispatch();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
-  const togglePasswordVisibility = () => {
-    setPasswordShown(!passwordShown);
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,32 +26,36 @@ export default function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { userType, email, password } = formData;
-    if (!userType || !email || !password) {
+    const { userType, email } = formData;
+    if (!userType || !email) {
       setError("Please fill in all fields");
       return;
     }
 
     setIsLoading(true);
-    const apiPath = "/api/auth/signin";
     try {
-      const response = await axios.post(apiPath, { email, password, userType });
+      const response = await axios.post("/api/forgot-password/reset-password", {
+        email,
+        userType,
+      });
+
+      console.log(response);
 
       if (response.status !== 200) {
         throw new Error("Network response was not ok.");
       }
-
-      const data = response.data;
-      dispatch(signInSuccess(data));
-      navigate("/search");
+      alert("Reset password link is sent successfully chack your email.");
+      navigate("/signin");
     } catch (error) {
-      console.error("Error occurred while signing in:", error);
+      console.log(error);
+      console.error("Error occurred while checking email:", error);
       if (
         error.response &&
         error.response.data &&
         error.response.data.message
       ) {
         setError(error.response.data.message);
+        setIsLoading(false);
       } else {
         setError("Network error, please try again later.");
       }
@@ -70,18 +65,17 @@ export default function SignIn() {
 
   return (
     <>
-      {/* <Header /> */}
-      <section className="flex items-center justify-center p-6">
+      <section className="flex justify-center p-6 h-screen items-center">
         <div className="w-full max-w-xs">
           <Typography
             variant="h3"
             color="blue-gray"
             className="mb-2 text-center"
           >
-            Sign In
+            Forgot-password
           </Typography>
           <Typography className="mb-8 text-gray-600 text-center text-xs">
-            Enter your email and password to sign in
+            Enter your email to recover your password
           </Typography>
           <form
             onSubmit={handleSubmit}
@@ -92,23 +86,6 @@ export default function SignIn() {
               name="email"
               label="Email"
               placeholder="example@gmail.com"
-              onChange={handleChange}
-              disabled={isLoading}
-            />
-            <Input
-              type={passwordShown ? "text" : "password"}
-              name="password"
-              icon={
-                <button onClick={togglePasswordVisibility} type="button">
-                  {passwordShown ? (
-                    <EyeIcon className="h-5 w-5" />
-                  ) : (
-                    <EyeSlashIcon className="h-5 w-5" />
-                  )}
-                </button>
-              }
-              label="Password"
-              placeholder="*******"
               onChange={handleChange}
               disabled={isLoading}
             />
@@ -138,26 +115,13 @@ export default function SignIn() {
               loading={isLoading}
               type="submit"
             >
-              Sign in
+              Submit
             </Button>
             <div className="mt-3 flex justify-end">
-              <Link to="/forgot-password" className="text-sm text-blue-900">
-                Forgot Password?
+              <Link to="/signin" className="text-sm text-blue-900">
+                Back to sign in
               </Link>
             </div>
-            <div className="mt-3 w-full">
-              <OAuth className="flex justify-center items-center p-3 w-full lowercase font-thin" />
-            </div>
-            <Typography
-              variant="small"
-              color="gray"
-              className="mt-4 text-center font-normal"
-            >
-              Not registered?{" "}
-              <Link to="/register" className="text-blue-900">
-                Create account
-              </Link>
-            </Typography>
           </form>
         </div>
       </section>
