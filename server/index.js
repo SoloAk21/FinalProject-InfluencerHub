@@ -14,8 +14,10 @@ import campaignRouter from "./routes/campaign.route.js";
 import agreementRouter from "./routes/agreement.route.js";
 import contentRouter from "./routes/content.route.js";
 import transferRouter from "./routes/transfer.route.js";
-
+import companyRouter from "./routes/company.route.js";
 import resetPasswordRouter from "./routes/resetpassword.route.js";
+import commentsRouter from "./routes/comment.route.js";
+
 import cors from "cors";
 import { app, io, server } from "./socket/socket.js";
 
@@ -40,6 +42,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/influencers", searchRouter);
+
 app.use("/api/collaborations", collaborationRouter);
 app.use("/api/messages", messageRouter);
 app.use("/api/conversations", conversationRouter);
@@ -49,6 +52,10 @@ app.use("/api/agreements", agreementRouter);
 app.use("/api/contents", contentRouter);
 app.use("/api/transfers", transferRouter);
 app.use("/api/forgot-password", resetPasswordRouter);
+app.use("/api/transfers", transferRouter);
+app.use("/api/comments", commentsRouter);
+app.use("/api/company", companyRouter);
+
 // Error handling middleware
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;

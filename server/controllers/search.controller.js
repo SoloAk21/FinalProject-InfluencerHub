@@ -125,7 +125,7 @@ export const getInfluencerDetail = async (req, res) => {
   try {
     const influencerId = req.params.id; // Extracts ID from URL
     const influencer = await Influencer.findById(influencerId).select(
-      "-_id -createdAt -password -updatedAt -__v -userType -active"
+      " -createdAt -password -updatedAt -__v -userType -active"
     ); // Excluding unwanted fields
     if (!influencer) {
       return res.status(404).json({ message: "Influencer not found" });

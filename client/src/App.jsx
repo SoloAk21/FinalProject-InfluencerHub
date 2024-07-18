@@ -18,17 +18,21 @@ import Payment from "./pages/brand/Payment";
 import ManageCampaign from "./pages/brand/ManageCampaign";
 import CampaignDetails from "./pages/brand/CampaignDetails";
 import PrivateRoute from "./components/PrivateRoute";
-import OAuth from "./components/AOuth";
-import ForgotPassword from "./pages/ForgotPassword";
+import Home from "./pages/Home";
+
 import ManageCollaborations from "./pages/ManageCollaborations";
 
 import UploadContent from "./pages/influencer/UploadContent";
 import Content from "./pages/Content";
 import InitiateTransfer from "./pages/InitiateTransfer";
 import DisplayTransfers from "./pages/DisplayTransfer";
-import Home from "./pages/Home";
+
 import Dashboard from "./pages/Dashboard";
+import Review from "./pages/brand/Review";
+import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+// import AboutUs from "./pages/AboutUs";
+// import ContactUs from "./pages/ContactUs";
 
 export default function App() {
   return (
@@ -82,6 +86,8 @@ export default function App() {
 
             <Route path="/detail-campaign" element={<CampaignDetails />} />
             <Route path="/companyprofile" element={<CompanyProfile />} />
+            <Route path="/review" element={<Review />} />
+
             <Route
               path="/detail-influencer/:id"
               element={<InfluencerDetail />}
