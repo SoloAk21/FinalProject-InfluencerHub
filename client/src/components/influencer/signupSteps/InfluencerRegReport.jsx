@@ -7,6 +7,8 @@ import { emailAuthReset } from "../../../redux/user/emailSlice";
 import { useDispatch } from "react-redux";
 import DynamicTable from "../../DynamicTable";
 import { postToAuthAPI } from "../../../helper/postToAuthAPI";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../../firebase";
 
 export default function InfluencerRegReport({ formData }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,9 +24,7 @@ export default function InfluencerRegReport({ formData }) {
 
     try {
       const response = await postToAuthAPI(apiPath, formData);
-      console.log(formData);
       const data = await response.json();
-      console.log(data);
       if (data.success === false) {
         setError(data.message);
       } else {
@@ -32,6 +32,12 @@ export default function InfluencerRegReport({ formData }) {
         dispatch(emailAuthReset());
         navigate("/registration-success");
       }
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+      console.log(userCredential);
     } catch (error) {
       setError(error.message);
     } finally {

@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from "react";
 import { Card, Typography, Button } from "@material-tailwind/react";
-import { FaEye, FaEyeSlash, FaFilePdf } from "react-icons/fa";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import { MdCancel } from "react-icons/md";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-import { storage } from "../../../firebase";
+import { auth, storage } from "../../../firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { emailAuthReset } from "../../../redux/user/emailSlice";
 import { useDispatch } from "react-redux";
@@ -28,7 +28,6 @@ export default function CompanyRegReport({ formData }) {
         formData.licenceDocument = licenceDocumentURL;
       } catch (error) {
         console.error("Error uploading file:", error);
-        // Handle error here
       }
     }
   };
@@ -61,7 +60,7 @@ export default function CompanyRegReport({ formData }) {
 
   const formatArrayValue = useMemo(
     () => (value) => value.join(", ").replace(/,(?=[^,]*$)/, " and"),
-    [formData] // Assuming formData is stable and doesn't change on every render
+    [formData]
   );
 
   const renderField = (key) => {

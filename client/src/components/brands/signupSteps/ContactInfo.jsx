@@ -7,12 +7,12 @@ import { useSelector } from "react-redux";
 import { FaArrowRight } from "react-icons/fa";
 import { postToAuthAPI } from "../../../helper/postToAuthAPI";
 
-export default function ContactInfo({ onNext }) {
+export default function ContactInfo({ onNext, formData }) {
   const email = useSelector((state) => state.email.email);
 
   const [contactInfo, setContactInfo] = useState({
-    contactName: "",
-    email: email,
+    contactName: formData.contactName,
+    email: formData.email,
     phoneNumber: "",
     password: "",
     confirmPassword: "",
@@ -119,16 +119,13 @@ export default function ContactInfo({ onNext }) {
           label="Contact Person's Name"
           placeholder="Abebe Bekele"
           value={contactInfo.contactName}
-          onChange={(e) => handleChange("contactName", e.target.value)}
-          error={errors.contactName}
-          required
+          disabled
         />
         <ValidatedInput
           label="Email Address"
           type="email"
           value={contactInfo.email}
-          error={errors.email}
-          required
+          disabled
         />
         <PhoneNumberInput
           label="Phone Number"

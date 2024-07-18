@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import DynamicTable from "../../components/DynamicTable";
-import { Typography } from "@material-tailwind/react";
+import { Button, Typography } from "@material-tailwind/react";
 import MainStructure from "./MainStructure";
 import { platformsIcons } from "../../helper/platformIcons";
+import Review from "./Review";
+import { useNavigate } from "react-router-dom";
 
 function InfluencerDetail() {
   const { id } = useParams();
   const [influencer, setInfluencer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   // useMemo hook moved to the top level
   const formatArrayValue = useMemo(
@@ -38,6 +42,10 @@ function InfluencerDetail() {
     fetchInfluencer();
   }, [id]);
 
+  const handleReviewClick = () => {
+    navigate("/review", { state: { influencer } });
+  };
+  console.log(influencer);
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -92,6 +100,9 @@ function InfluencerDetail() {
             </div>
           </div>
           <DynamicTable headers={tableHeaders} data={tableData} />
+          <div className="flex justify-center mt-3">
+            <Button onClick={handleReviewClick}>review</Button>
+          </div>
         </div>
       ) : (
         <p>No influencer details available.</p>

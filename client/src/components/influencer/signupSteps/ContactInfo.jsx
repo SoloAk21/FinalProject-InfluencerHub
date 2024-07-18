@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button, Typography, IconButton } from "@material-tailwind/react";
+import { Card, Typography, IconButton } from "@material-tailwind/react";
 import { PhoneNumberInput } from "../../PhoneNumberInput";
 import validator from "validator";
 import ValidatedInput from "../../ValidatedInput"; // Ensure you have a ValidatedInput component that can handle validation feedback
@@ -8,19 +8,19 @@ import { FaArrowRight } from "react-icons/fa";
 import { postToAuthAPI } from "../../../helper/postToAuthAPI";
 import { useNavigate } from "react-router-dom";
 
-export default function ContactInfo({ onNext }) {
-  const email = useSelector((state) => state.email.email);
-  const navigate = useNavigate();
-  console.log(email);
-  useEffect(() => {
-    if (!email) {
-      // Redirect to Google Auth path if email is empty
-      navigate("/influencer/google");
-    }
-  }, [email, navigate]);
+export default function ContactInfo({ onNext, formData }) {
+  // const email = useSelector((state) => state.email.email);
+  // const navigate = useNavigate();
+  // console.log(email);
+  // useEffect(() => {
+  //   if (!email) {
+  //     // Redirect to Google Auth path if email is empty
+  //     navigate("/influencer/google");
+  //   }
+  // }, [email, navigate]);
   const [userInfo, setUserInfo] = useState({
-    username: "",
-    email: email,
+    username: formData.contactName,
+    email: formData.email,
     phoneNumber: "",
     password: "",
     confirmPassword: "",
@@ -60,40 +60,40 @@ export default function ContactInfo({ onNext }) {
       return;
     }
 
-    const checkData = { email: userInfo.email, username: userInfo.username };
+    // const checkData = { email: userInfo.email, username: userInfo.username };
 
-    const apiPath = "/api/auth/influencers/check";
+    // const apiPath = "/api/auth/influencers/check";
 
-    try {
-      const response = await postToAuthAPI(apiPath, { checkData });
+    // try {
+    //   const response = await postToAuthAPI(apiPath, { checkData });
 
-      if (!response.ok) {
-        throw new Error(
-          `Error checking username and email: ${response.statusText}`
-        ); // More informative error message
-      }
+    //   if (!response.ok) {
+    //     throw new Error(
+    //       `Error checking username and email: ${response.statusText}`
+    //     ); // More informative error message
+    //   }
 
-      const data = await response.json();
-      console.log(data);
-      if (data.success === false) {
-        const newErrors = {};
-        for (const error of data.errors) {
-          newErrors[error.exist] = error.error;
-        }
-        setErrors(newErrors);
-        setIsLoading(false);
-        return;
-      }
+    //   const data = await response.json();
+    //   console.log(data);
+    //   if (data.success === false) {
+    //     const newErrors = {};
+    //     for (const error of data.errors) {
+    //       newErrors[error.exist] = error.error;
+    //     }
+    //     setErrors(newErrors);
+    //     setIsLoading(false);
+    //     return;
+    //   }
 
-      // Successful username and email check (data.success === true)
-    } catch (error) {
-      console.error("Error checking username and email:", error);
-      setErrors({
-        email: "Error checking username and email. Please try again.",
-      });
-      setIsLoading(false);
-      return;
-    }
+    //   // Successful username and email check (data.success === true)
+    // } catch (error) {
+    //   console.error("Error checking username and email:", error);
+    //   setErrors({
+    //     email: "Error checking username and email. Please try again.",
+    //   });
+    //   setIsLoading(false);
+    //   return;
+    // }
     setErrors({});
     setIsLoading(false);
     onNext(userInfo); // Proceed to the next step or handle form submission
@@ -116,13 +116,13 @@ export default function ContactInfo({ onNext }) {
           value={userInfo.username}
           onChange={(e) => handleChange("username", e.target.value)}
           error={errors.username}
-          required
+          disabled
         />
         <ValidatedInput
           label="Email Address"
           value={userInfo.email}
           error={errors.email}
-          required
+          disabled
         />
         <PhoneNumberInput
           label="Phone Number"

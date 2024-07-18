@@ -1,23 +1,25 @@
 import React, { useState } from "react";
 import {
   Card,
-  Button,
   Typography,
   Textarea,
   IconButton,
 } from "@material-tailwind/react";
 import { INDUSTRY } from "../../../constants";
-import MultiSelect from "../../MultiSelect";
-import { FaArrowRight, FaExclamation } from "react-icons/fa";
+import { FaArrowRight } from "react-icons/fa";
 import ValidatedInput from "../../ValidatedInput";
 import validator from "validator";
 import { postToAuthAPI } from "../../../helper/postToAuthAPI";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
 
 export default function CompanyInfo({ onNext }) {
   const [companyInfo, setCompanyInfo] = useState({
     companyName: "",
     companyWebsite: "",
-    industry: [],
+    industry: "",
     companyDescription: "",
     userType: "company",
   });
@@ -27,6 +29,7 @@ export default function CompanyInfo({ onNext }) {
   });
   const [isLoading, setIsLoading] = useState(false);
 
+  const options = INDUSTRY;
   const handleChange = (field, value) => {
     setCompanyInfo((prev) => ({ ...prev, [field]: value }));
   };
@@ -42,8 +45,8 @@ export default function CompanyInfo({ onNext }) {
       newErrors.companyName = "Company Name is required";
     }
 
-    if (industry.length === 0) {
-      newErrors.industry = "Please select at least one industry";
+    if (!industry) {
+      newErrors.industry = "Please select an industry";
     }
 
     // Only validate website if it's provided
@@ -109,13 +112,25 @@ export default function CompanyInfo({ onNext }) {
           onChange={(e) => handleChange("companyWebsite", e.target.value)}
           error={errors.companyWebsite}
         />
-        <MultiSelect
-          label="Industry"
-          options={INDUSTRY}
-          selectedOptions={companyInfo.industry}
-          onChange={(value) => handleChange("industry", value)}
-          error={errors.industry}
-        />
+        <FormControl>
+          <InputLabel>Industry</InputLabel>
+          <Select
+            value={companyInfo.industry}
+            onChange={(e) => handleChange("industry", e.target.value)}
+            error={!!errors.industry}
+          >
+            {options.map((option, index) => (
+              <MenuItem key={index} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+          {!!errors.industry && (
+            <Typography variant="caption" color="red">
+              {errors.industry}
+            </Typography>
+          )}
+        </FormControl>
         <div>
           <Textarea
             label="Company Description (optional)"

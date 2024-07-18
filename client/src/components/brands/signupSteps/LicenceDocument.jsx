@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Card, Button, Typography, IconButton } from "@material-tailwind/react";
-import { FaArrowRight, FaFilePdf, FaUpload } from "react-icons/fa";
+import { Card, Typography, IconButton } from "@material-tailwind/react";
+import { FaArrowRight, FaUpload } from "react-icons/fa";
 
 export default function LicenceVerification({ onNext, formData }) {
   const [selectedFile, setSelectedFile] = useState(null);

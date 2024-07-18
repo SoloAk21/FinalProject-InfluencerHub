@@ -44,14 +44,14 @@ export default function App() {
           <Route path="/signin" element={<SignIn />} />
 
           {/* OAuth Redirects */}
-          <Route
+          {/* <Route
             path="/company/google"
             element={<OAuth userType="company" />}
-          />
-          <Route
+          /> */}
+          {/* <Route
             path="/influencer/google"
-            element={<OAuth userType="influencer" />}
-          />
+            element={<OAuth userType="influencer" />} */}
+          {/* /> */}
 
           {/* Routes accessible to both company and influencer */}
           <Route element={<PrivateRoute userTypeAllowed={null} />}>

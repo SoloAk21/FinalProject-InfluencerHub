@@ -4,6 +4,7 @@ import ContactInfo from "../../components/influencer/signupSteps/ContactInfo";
 import PersonalInfo from "../../components/influencer/signupSteps/PersonalInfo";
 import SocialMediaProfile from "../../components/influencer/signupSteps/SocialMediaPlatform";
 import InfluencerRegReport from "../../components/influencer/signupSteps/InfluencerRegReport";
+import Google from "../../components/Google";
 
 export default function SignUpInfluencer() {
   const [activeStep, setActiveStep] = useState(0);
@@ -16,9 +17,10 @@ export default function SignUpInfluencer() {
   };
 
   const steps = [
-    <ContactInfo onNext={handleNext} setFormData={setFormData} />,
-    <PersonalInfo onNext={handleNext} setFormData={setFormData} />,
-    <SocialMediaProfile onNext={handleNext} setFormData={setFormData} />,
+    <Google onNext={handleNext} />,
+    <ContactInfo onNext={handleNext} formData={formData} />,
+    <PersonalInfo onNext={handleNext} />,
+    <SocialMediaProfile onNext={handleNext} />,
     <InfluencerRegReport formData={formData} />,
   ];
 

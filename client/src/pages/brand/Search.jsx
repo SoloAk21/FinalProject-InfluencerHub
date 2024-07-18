@@ -11,6 +11,7 @@ import MainStructure from "./MainStructure";
 // import { InfluencerProfile } from "../../components/brands/InfluencerProfile";
 import SearchByUsername from "../../components/brands/search/SearchByUsername";
 import SearchByFilter from "../../components/brands/search/SearchByFilter";
+import { useSelector } from "react-redux";
 
 export default function Search() {
   const data = [
@@ -23,6 +24,8 @@ export default function Search() {
       value: "searchByFilters",
     },
   ];
+  const { currentUser } = useSelector((state) => state.user);
+
   const searchPage = (
     <Tabs id="custom-animation" value="searchByUsername" className="text-xs ">
       <TabsHeader

@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Stepper, Step, Button } from "@material-tailwind/react";
+import { Stepper, Step } from "@material-tailwind/react";
 import CompanyInfo from "../../components/brands/signupSteps/CompanyInfo";
 import ContactInfo from "../../components/brands/signupSteps/ContactInfo";
 import LicenseDocument from "../../components/brands/signupSteps/LicenceDocument";
 import CompanyRegReport from "../../components/brands/signupSteps/CompanyRegReport";
+import Google from "../../components/Google";
 
 export default function SignUpCompany() {
   const [activeStep, setActiveStep] = useState(0);
@@ -16,9 +17,10 @@ export default function SignUpCompany() {
   };
 
   const steps = [
-    <CompanyInfo onNext={handleNext} setFormData={setFormData} />,
-    <ContactInfo onNext={handleNext} setFormData={setFormData} />,
-    <LicenseDocument onNext={handleNext} setFormData={setFormData} />,
+    <Google onNext={handleNext} />,
+    <ContactInfo onNext={handleNext} formData={formData} />,
+    <CompanyInfo onNext={handleNext} />,
+    <LicenseDocument onNext={handleNext} />,
     <CompanyRegReport formData={formData} />,
   ];
 
