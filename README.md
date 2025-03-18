@@ -1,6 +1,6 @@
 # Influencer Hub
 
-![Influencer Hub Banner]([https://via.placeholder.com/1200x400?text=Influencer+Hub](https://res.cloudinary.com/dvennby8x/image/upload/v1742314533/snypvkzdbstdzjuxmun3.png))
+![Influencer Hub Banner](https://res.cloudinary.com/dvennby8x/image/upload/v1742314533/snypvkzdbstdzjuxmun3.png)
 
 [![GitHub Issues](https://img.shields.io/github/issues/[SoloAk21/FinalProject-InfluencerHub](https://github.com/SoloAk21/FinalProject-InfluencerHub))](https://github.com/SoloAk21/FinalProject-InfluencerHub/issues)
 [![GitHub Stars](https://img.shields.io/github/stars/SoloAk21/FinalProject-InfluencerHub)](https://github.com/SoloAk21/FinalProject-InfluencerHub/stargazers)
