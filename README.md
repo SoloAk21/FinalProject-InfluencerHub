@@ -58,10 +58,6 @@ Influencer Hub is a powerful and user-friendly platform designed to connect comp
 | **Axios**          | HTTP requests handling |
 | **React Router**   | Client-side routing |
 | **Material Tailwind** | Enhanced UI components |
-| **React Toastify** | User-friendly notifications |
-| **Formik & Yup**   | Form validation and handling |
-| **Lodash**         | Utility functions for cleaner code |
-| **Cloudinary API** | Image and media storage |
 | **Insomnia/Postman** | API testing and debugging |
 | **Git & GitHub**   | Version control and collaboration |
 
